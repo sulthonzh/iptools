@@ -3,9 +3,33 @@
   "version": "1.0.0",
   "description": "Zero-dep IPv4/IPv6 toolkit — parse, validate, CIDR math, subnet division, range operations",
   "main": "index.js",
-  "bin": { "iptools": "cli.js" },
-  "scripts": { "test": "node test.js" },
-  "keywords": ["ip", "ipv4", "ipv6", "cidr", "subnet", "network", "range"],
+  "bin": {
+    "iptools": "cli.js"
+  },
+  "scripts": {
+    "test": "node test.js"
+  },
+  "keywords": [
+    "ip",
+    "ipv4",
+    "ipv6",
+    "cidr",
+    "subnet",
+    "network",
+    "range"
+  ],
   "license": "MIT",
-  "author": "sulthonzh"
+  "author": "sulthonzh",
+  "files": [
+    "index.js",
+    "cli.js",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sulthonzh/iptools.git"
+  }
 }
