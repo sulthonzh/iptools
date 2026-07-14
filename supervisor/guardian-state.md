@@ -1,15 +1,15 @@
 # Guardian State — Meta Supervisor
 
-Last Updated: 2026-07-14T20:03:00+07:00
+Last Updated: 2026-07-15T00:04:00+07:00
 
 ---
 
 ## Active Incidents
 
-### INC-20260708-001: WorkspaceVanishedError — RECURRING (33rd occurrence)
+### INC-20260708-001: WorkspaceVanishedError — RECURRING (34th occurrence)
 
 **Pattern**: Attestation files from wealth-lab/oss-lab workspaces contaminate main workspace attestation directory.
-**Status This Cycle**: 🟡 3 contaminated files cleaned (33rd occurrence). 1 valid attestation (TOOLS.md, hash 15cdfe57) preserved.
+**Status This Cycle**: 🟡 3 contaminated files cleaned (34th occurrence). Directory now clean.
 **Root Cause**: Gateway-level bug. Multi-agent attestation generation writes to shared directory.
 
 **Pattern History**:
@@ -33,24 +33,25 @@ Last Updated: 2026-07-14T20:03:00+07:00
 - 29th: 2026-07-14T04:01 — 3 files cleaned
 - 30th: 2026-07-14T08:03 — 3 files cleaned
 - 31st: 2026-07-14T12:05 — 2 files cleaned
-- 32nd: 2026-07-14T16:19 — 2 files cleaned (scoreboard updated)
+- 32nd: 2026-07-14T16:19 — 2 files cleaned
 - 33rd: 2026-07-14T20:03 — 3 files cleaned
+- 34th: 2026-07-15T00:04 — 3 files cleaned
 
 **Note**: Contamination continues recurring but is not causing job failures currently. Gateway-level fix still needed.
 
 ---
 
-### INC-20260714-013: Supervisor Incident Scanner CE=6 — PROVIDER BILLING COOLDOWN — RE-ENABLED
+### INC-20260714-013: Supervisor Incident Scanner CE=2 — PROVIDER BILLING COOLDOWN (CONTINUING)
 
-**Status**: 🟡 RE-ENABLED — Job was disabled (CE=6) due to provider billing cooldown. All 3 models failed (glm-5.1 cooldown, glm-4.5-air idle timeout, glm-4.7-flash rate limit). Provider has recovered (this guardian cycle ran fine on glm-5.2). Re-enabled job, next run 20:43 WIB should succeed.
-**Root Cause**: Transient provider billing cooldown — cannot auto-fix, but provider appears recovered.
-**Action**: Re-enabled job. If next run fails, escalate.
+**Status**: 🟡 Provider billing cooldown still affecting this job. Last run failed with all 3 models failing (glm-5.1 billing cooldown, glm-4.5-air idle timeout, glm-4.7-flash idle timeout). Swapped primary model to glm-4.5-air. This guardian cycle ran fine on glm-5.2, so provider may have recovered — next run at 00:43 WIB should be watched.
+**Root Cause**: Transient provider billing cooldown — cannot auto-fix, but provider appears to be recovering.
+**Action**: Swapped model to glm-4.5-air. If next run still fails, escalate.
 
 ---
 
-### INC-20260714-012: pr-review-merge-supervisor CE=1 — RECOVERING
+### INC-20260714-012: pr-review-merge-supervisor CE=0 — RECOVERED ✅
 
-**Status**: 🟢 Recovering (CE=2→1). `gh pr merge 12 --repo sulthonzh/tree-diff --squash --auto` failed. Likely CI/branch protection. Watching only.
+**Status**: 🟢 Recovered (CE=1→0). Job running normally.
 
 ---
 
@@ -63,15 +64,15 @@ Last Updated: 2026-07-14T20:03:00+07:00
 
 ---
 
-## Job Health Summary (2026-07-14T20:03)
+## Job Health Summary (2026-07-15T00:04)
 - Total jobs: 60
 - CE=0 (healthy): 52 ✅
-- CE=1 (transient): 5 (all transient — below escalation threshold)
-- CE>=2 (failing): 2
-  - idx-opening-gap CE=3 — transient `ps aux | grep` tool failure, next run tomorrow 09:05 WIB
-  - idx-early-boom CE=2 — transient file listing failure, next run tomorrow 09:15 WIB
-- Disabled: 0 (Supervisor Incident Scanner re-enabled)
-- No critical incidents requiring human intervention
+- CE=1 (transient): 5 (all below escalation threshold)
+- CE>=2 (failing): 3
+  - Supervisor Incident Scanner CE=2 — provider billing cooldown, model swapped to glm-4.5-air
+  - idx-opening-gap CE=3 — platform-level setup timeout, next run tomorrow 09:05 WIB
+  - idx-early-boom CE=2 — platform-level setup timeout, next run tomorrow 09:15 WIB
+- Disabled: 1 (Call with Janice reminder — unrelated to system health)
 
 ---
 
@@ -79,21 +80,21 @@ Last Updated: 2026-07-14T20:03:00+07:00
 
 | Job | Action | Details |
 |-----|--------|---------|
-| Attestation cleanup | Removed 3 contaminated files | 33rd occurrence INC-20260708-001 |
-| Supervisor Incident Scanner | Re-enabled (was disabled) | Provider recovered from billing cooldown, CE=6, next run 20:43 WIB |
+| Attestation cleanup | Removed 3 contaminated files | 34th occurrence INC-20260708-001 |
+| Supervisor Incident Scanner | Model swap glm-5.1→glm-4.5-air | Provider billing cooldown on glm-5.1 |
 
 ---
 
 ## 🔔 Still Watching
 
-- **idx-opening-gap CE=3** — Transient `ps aux` grep failure. Market hours (next run tomorrow 09:05 WIB). Should self-recover.
-- **idx-early-boom CE=2** — Transient file listing failure. Market hours (next run tomorrow 09:15 WIB). Should self-recover.
-- **Attestation contamination** — 33rd occurrence, 3 files cleaned. Gateway-level fix still needed.
+- **Supervisor Incident Scanner CE=2** — Provider billing cooldown. Model swapped. If next run fails, escalate.
+- **idx-opening-gap CE=3** — Platform-level setup timeout. Market hours (next run tomorrow 09:05 WIB). Should self-recover.
+- **idx-early-boom CE=2** — Platform-level setup timeout. Market hours (next run tomorrow 09:15 WIB). Should self-recover.
+- **Attestation contamination** — 34th occurrence, 3 files cleaned. Gateway-level fix still needed.
 - **Plugin version mismatch** — config written by 2026.7.1 but CLI running 2026.6.6. Not causing failures yet but needs `openclaw` update.
-- **pr-review-merge-supervisor CE=1** — Recovering from gh pr merge failure (CI/branch protection).
 
 ---
 
 ## Notes
 
-Provider zai appears to have recovered from the billing/cooldown issue that affected Supervisor Incident Scanner (CE=6). Job has been re-enabled and should succeed on next run at 20:43 WIB. This guardian cycle itself ran fine on glm-5.2, confirming provider recovery.
+Provider zai still experiencing intermittent billing cooldown on glm-5.1. This guardian cycle ran fine on glm-5.2, indicating partial provider recovery. Supervisor Incident Scanner model swapped to glm-4.5-air as primary — but glm-4.5-air was also timing out during the last failure. Next run at 00:43 WIB will be the real test.
