@@ -4,7 +4,8 @@
   "description": "Zero-dep IPv4/IPv6 toolkit — parse, validate, CIDR math, subnet division, range operations",
   "main": "index.js",
   "bin": {
-    "iptools": "cli.js"
+    "iptools": "cli.js",
+    "prompt-bisect": "cli.js"
   },
   "scripts": {
     "test": "node test.js"
@@ -30,7 +31,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/sulthonzh/iptools.git"
+    "url": "git+https://github.com/sulthonzh/prompt-bisect.git"
   },
   "devDependencies": {
     "@types/node": "^26.1.1",
