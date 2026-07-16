@@ -1,98 +1,94 @@
-# Mole State - 2026-07-15 21:24 GMT+7
-## Status: STABLE - Rotation 59 COMPLETE
+# Mole State - 2026-07-16 14:07 GMT+7
+## Status: STABLE - Rotation 81 COMPLETE
 ## Pre-Flight Protocol: 5-Step Analysis - COMPLETED
-## Rotation: 59 COMPLETE - Task 3 (Disk Usage) - Ready for Rotation 60 (Task 4: Agent Workspace Validation)
+## Rotation: 81 COMPLETE - Task 5 (State File Hygiene) - Ready for Rotation 82 (Task 1: Cron Health)
 
 ### Step 1: Read Own State ✅
-- Last update: 2026-07-15T21:24 GMT+7
-- Previous cycle: Rotation 58 complete (Task 2: Stale Sessions)
-- Current cycle: Rotation 59 - Task 3 (Disk Usage)
+- Last update: 2026-07-16T14:07 GMT+7
+- Previous cycle: Rotation 80 complete (Task 4: Agent Workspace Validation)
+- Current cycle: Rotation 81 - Task 5 (State File Hygiene)
 
 ### Step 2: Check Tracker ✅
 - Tracker found: mole-decisions.log
-- Last entry: 2026-07-15T21:24:00+07:00
+- Last entry: 2026-07-16T11:24:00+07:00
 
 ### Step 3: Read Decisions Log ✅
-- Last entry: 2026-07-15T21:24:00+07:00
+- Last entry: 2026-07-16T11:55:00+07:00
 
 ### Step 4: Analyze Current State ✅
-- 🔴 FAILING: 13 jobs with consecutiveErrors >= 1 (provider rate limits, tool failures, infrastructure) - NOT auto-fixable
+- 🔴 FAILING: 13 jobs with consecutiveErrors (all outside auto-fix scope)
 - 🟡 IN_PROGRESS: None
 - 🟠 STALE_INCOMPLETE: None
 - 🟢 DONE_NEEDS_POLISH: None
-- ⚪ DONE_EXCEPTIONAL: Rotations 1-59 complete
-- 🆕 READY: Rotation 60 - Task 4 (Agent Workspace Validation)
+- ⚪ DONE_EXCEPTIONAL: Rotations 1-81 complete
+- 🆕 READY: Rotation 82 - Task 1 (Cron Health)
 
 ### Step 5: Decision
-- Task 1 (Cron Health) — READY (rotation pattern - last run Rotation 57)
-- Task 2 (Stale Sessions) — READY (rotation pattern - last run Rotation 58)
-- Task 3 (Disk Usage) — COMPLETED (Rotation 59)
-- Task 4 (Agent Workspace Validation) — READY (rotation pattern - last run Rotation 55)
-- Task 5 (State File Hygiene) — READY (rotation pattern - last run Rotation 56)
-- Ready for Rotation 60: Task 4 (Agent Workspace Validation)
+- Task 1 (Cron Health) — COMPLETE (last run Rotation 77)
+- Task 2 (Stale Sessions) — COMPLETE (last run Rotation 78)
+- Task 3 (Disk Usage) — COMPLETE (last run Rotation 79)
+- Task 4 (Agent Workspace Validation) — COMPLETE (last run Rotation 80)
+- Task 5 (State File Hygiene) — COMPLETE (last run Rotation 81)
+- Ready for Rotation 82: Task 1 (Cron Health)
 
 ## Actions Taken This Cycle
-- [⏭] Task 1: SKIPPED (rotation pattern - last run Rotation 57)
-- [⏭] Task 2: SKIPPED (rotation pattern - last run Rotation 58)
-- [✅] Task 3: Disk Usage — COMPLETED (9.2G stable, no cleanup needed)
-- [⏭] Task 4: SKIPPED (rotation pattern - last run Rotation 55)
-- [⏭] Task 5: SKIPPED (rotation pattern - last run Rotation 56)
+- [⏭] Task 1: SKIPPED (rotation pattern - last run Rotation 77)
+- [⏭] Task 2: SKIPPED (rotation pattern - last run Rotation 78)
+- [⏭] Task 3: SKIPPED (rotation pattern - last run Rotation 79)
+- [⏭] Task 4: SKIPPED (rotation pattern - last run Rotation 80)
+- [✅] Task 5: State File Hygiene — COMPLETE (state files updated)
 
-## Rotation 59 Actions Completed
-- Total disk usage: `du -sh /Users/sulthonzh/.openclaw/` → 9.2G (stable vs Rotation 54)
-- Breakdown: `du -sh /Users/sulthonzh/.openclaw/* | sort -rh` → agents/ 5.4G, npm/ 3.5G, tmp/ 108M, workspace/ 105M, state/ 88M
-- Cleanup check: `find /Users/sulthonzh/.openclaw/ -name "*.log" -mtime +30` → 0 old logs
-- Cleanup check: `find /Users/sulthonzh/.openclaw/ -name "*.bak"` → 1 .bak file (openclaw.json.bak — yesterday, keep)
-- Cleanup check: `find /Users/sulthonzh/.openclaw/tmp/ -type f -mtime +30` → 0 orphaned tmp files
-- NO_CLEANUP: All consumers essential, no old junk found
-- Updated mole-state.md with Rotation 59 actions + timestamp
-- Logged decision to mole-decisions.log: Disk Usage (stable, no cleanup)
+## Rotation 81 Actions Completed
+- Updated mole-state.md with Rotation 81 status + timestamp
+- Appended decision to mole-decisions.log
+- State files current and clean
 - Exit code: 0 (successful)
 
-## Cron Health Status (from Rotation 57 - monitoring only, no auto-fixes applicable)
+## Cron Health Status (Rotation 77 - no changes)
 - **Total Jobs**: 60
-- **Jobs with consecutiveErrors >= 1**: 13 (MONITORING - no auto-fixes applicable)
-  - oss-code-reviewer (4 errors, rate limit)
-  - Supervisor Incident Scanner (3 errors, rate limit)
-  - wealth-builder (2 errors, rate limit)
-  - IDX Daily Precompute (1 error, tool failure - ps grep)
-  - method-weekly-calibrate (1 error, gateway restart)
-  - pr-review-merge-supervisor (1 error, pending analysis)
-  - marketing-supervisor (1 error, pending analysis)
-  - oss-builder (1 error, pending analysis)
-  - idx-afternoon-momentum (1 error, pending analysis)
-  - idx-closing-momentum (1 error, pending analysis)
-  - paper-trade-morning-eval (1 error, pending analysis)
-  - Call with Janice reminder (1 error, pending analysis)
-  - mole-optimize-hourly (1 error, this job - not relevant)
-- **Action**: MONITORING - 13 jobs escalated (provider rate limits, tool failures, infrastructure - not auto-fixable)
-- **Auto-fixes applied**: 0 (all errors outside autonomy scope)
-- **Escalations**: 13 items (require human intervention)
+- **Jobs with consecutiveErrors >= 1**: 13 (MONITORING - all escalated)
+  - ⚠️ **ESCALATED**: wealth-builder (1 error, billing/rate limit - model availability)
+  - ⚠️ **ESCALATED**: Supervisor Incident Scanner (1 error, exec failed - tool issue)
+  - ⚠️ **ESCALATED**: oss-builder (1 error, agent couldn't generate response - model availability)
+  - ⚠️ **ESCALATED**: idx-afternoon-momentum (1 error, ps grep failed - tool issue)
+  - ⚠️ **ESCALATED**: idx-closing-momentum (1 error, process poll failed - tool issue)
+  - ⚠️ **ESCALATED**: paper-trade-morning-eval (1 error, agent couldn't generate response - model availability)
+  - ⚠️ **ESCALATED**: idx-06-precache (1 error, agent couldn't generate response - model availability)
+  - ⚠️ **ESCALATED**: Crypto V3 Morning Scan (1 error, agent couldn't generate response - model availability)
+  - ⚠️ **ESCALATED**: idx-composed-premarket (1 error, ps grep failed - tool issue)
+  - ⚠️ **ESCALATED**: idx-early-boom (1 error, process grep failed - tool issue)
+  - ⚠️ **ESCALATED**: method-weekly-calibrate (1 error, gateway restart - infrastructure)
+  - ⚠️ **ESCALATED**: Call with Janice reminder (1 error, no channels configured - config issue)
+- **Breakdown by cause**:
+  - MODEL AVAILABILITY (billing/rate limit/timeout): 5 jobs (wealth-builder, oss-builder, paper-trade-morning-eval, idx-06-precache, Crypto V3 Morning Scan)
+  - TOOL ISSUE (ps grep/process tool): 4 jobs (Supervisor Incident Scanner, idx-afternoon-momentum, idx-closing-momentum, idx-early-boom, idx-composed-premarket)
+  - INFRASTRUCTURE (gateway restart): 1 job (method-weekly-calibrate)
+  - CONFIG (no channels): 1 job (Call with Janice reminder)
+- **Auto-fixes applied**: 0 (none match auto-fixable patterns)
+- **Escalations**: 13 items (provider, infrastructure, tool, config failures)
+- **Next Check**: Rotation 85 (Task 1)
 
-## Agent Workspace Status (from Rotation 55 - verified, re-check scheduled Rotation 60)
+## Agent Workspace Status (Rotation 80 - verified)
 | Agent | Workspace Path | Status |
 |-------|---------------|--------|
 | main | /Users/sulthonzh/.openclaw/workspace | EXISTS ✓ |
 | oss-lab | /Users/sulthonzh/Data/projects/quadbyte/open-source-lab | EXISTS ✓ |
 | wealth-lab | /Users/sulthonzh/Data/projects/quadbyte/wealth-builder | EXISTS ✓ |
 | challenge-lab | /Users/sulthonzh/Data/projects/quadbyte/logchef-zig | EXISTS ✓ |
-- **Next Check**: Rotation 60 (~1 rotation)
 
-## Disk Status (from Rotation 59 - stable, re-check scheduled Rotation 64)
-- **Total Size**: 9.2G (stable vs Rotation 54)
-- **Breakdown**: agents/ 5.4G, npm/ 3.5G, tmp/ 108M (+8M normal), workspace/ 105M, state/ 88M
-- **Last Cleanup**: Rotation 58 - Stale Sessions (removed 12 tmp directories >7 days)
-- **Last Disk Check**: Rotation 59 - None needed (all consumers essential, no old junk)
-- **Next Disk Check**: Rotation 64 (~5 rotations)
-
-## Overall Assessment
-**URGENCY**: LOW (13 jobs with errors, all provider/infrastructure/tool related - not auto-fixable; disk stable)
-**System Health**: STABLE (disk 9.2G, all workspaces exist, tmp stable, 47/60 jobs ok; 13 jobs with errors)
-**Auto-Fixes Applied**: 0 (all errors are provider/infrastructure/tool related - not auto-fixable per autonomy rules)
-**Escalations**: 13 items (provider rate limits, tool failures, infrastructure issues - require human)
-**Cleanup This Cycle**: 0 (no old junk found, all consumers essential)
+## Disk Status (Rotation 79 - stable)
+- **Total Size**: 9.3G (stable)
+- **Breakdown**: agents/ 5.5G, npm/ 3.5G, tmp/ 139M, workspace/ 105M, state/ 88M
+- **Last Cleanup**: Rotation 79 - Disk Usage (cleaned old logs >30d from state/, stale .bak >30d from agents/)
 
 ## Next Steps
-1. Start Rotation 60 - Task 4 (Agent Workspace Validation)
-2. Continue monitoring 13 jobs with consecutiveErrors (provider rate limits, tool failures, infrastructure issues)
-3. Follow rotation pattern: Task 4 → Task 5 → Task 1 → Task 2 → Task 3
+1. Start Rotation 82 - Task 1 (Cron Health)
+2. Continue monitoring 13 jobs with consecutiveErrors (provider, infrastructure, tool, config failures)
+3. Follow rotation pattern: Task 1 → Task 2 → Task 3 → Task 4 → Task 5
+
+## Overall Assessment
+**URGENCY**: LOW (13 jobs with errors, all provider/infrastructure/tool/config related - not auto-fixable)
+**System Health**: STABLE (disk 9.3G, all workspaces exist, 47/60 jobs ok; 13 jobs with errors)
+**Auto-Fixes Applied**: 0 (nothing to fix)
+**Escalations**: 13 items (provider, infrastructure, tool, config failures - require human)
+**Cleanup This Cycle**: Agent workspace validation completed (Task 4)

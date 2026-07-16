@@ -1,78 +1,75 @@
 # Supervisor Incident Scanner State
 
-Last updated: 2026-07-15 21:57 WIB
+Last updated: 2026-07-16 11:44 WIB
 
 ## ACTIVE INCIDENTS
 
-**None.** All cleared. 🎉
+### INC-20260716-001 — oss-builder model failure (3 consecutive errors)
+- **Affected jobs:** oss-builder (372e2507)
+- **Root cause:** Model failure — "Agent couldn't generate a response" on glm-4.5-air
+- **Error pattern:** Agent unable to generate response. Started after 2 successful runs at 08:57 WIB. Failures began at 09:49 WIB.
+- **Consecutive errors:** 3
+- **Status:** ACTIVE — monitoring. Auto-heal threshold is ≥5; will switch to fallback model (glm-4.7-flash) if it hits 5.
+- **First seen:** 2026-07-16 09:49 WIB
+- **Last seen:** 2026-07-16 11:09 WIB (approx, based on hourly schedule)
 
 ---
 
-## PREVIOUSLY RESOLVED INCIDENTS
+## MONITORING (1 error — watch list)
 
-### INC-20260715-004: Model Availability - Timeout/Rate Limit (RESOLVED ✅)
-**Resolved:** 2026-07-15 21:57 WIB
-**First seen:** 2026-07-15 14:45 WIB
-**Last seen:** 2026-07-15 20:09 WIB
-**Root cause:** All 3 models failing for halal-wealth-research-supervisor (timeout/rate limit). Auto-heal applied at 20:43 WIB switching model. Confirmed recovered at 21:57 WIB — job now reports 0 consecutive errors, lastStatus=ok.
-**Resolution:** Auto-heal succeeded. Job healthy.
+**13 jobs with 1 consecutive error (up from 9 at 09:43 scan):**
 
-### INC-20260715-005: opencode-session-supervisor Agent Response Failure (RESOLVED)
-**Resolved:** 2026-07-15 20:43 WIB
+**Model response failures (4 jobs):**
+- `paper-trade-morning-eval` (9c353e13): "Agent couldn't generate a response"
+- `idx-06-precache` (bb14122f): "Agent couldn't generate a response"
+- `Crypto V3 Morning Scan` (79e66b9f): "Agent couldn't generate a response"
+- `oss-code-reviewer` (b0091acb): Exec failed — python3 heredoc in tracker
 
-### INC-20260715-003: halal-wealth-research-supervisor (RESOLVED → MERGED into INC-004)
-### INC-20260715-002: idx-early-boom Tool Failure (RESOLVED — SELF-HEALED)
-**Resolved:** 2026-07-15 11:43 WIB
-### INC-20260715-001: Supervisor Incident Scanner Provider Billing Failure (RESOLVED)
-**Resolved:** 2026-07-15 05:45 WIB
-### INC-20260713-006: pr-review-merge-supervisor GitHub CLI Tool Failure (RESOLVED)
-**Resolved:** 2026-07-14 02:43 WIB
-### INC-20260713-005: oss-code-reviewer Tool Failure (RESOLVED)
-**Resolved:** 2026-07-13 20:53 WIB
-### INC-20260713-004: idx-opening-gap Tool Failure (RESOLVED — SELF-HEALED)
-**Resolved:** 2026-07-15 11:43 WIB
-### INC-20260713-003: openclaw-backup-sync Timeout (RESOLVED)
-**Resolved:** 2026-07-13 12:29 WIB
-### INC-20260713-002: idx-morning-review Agent Generation Failure (RESOLVED)
-**Resolved:** 2026-07-13 12:29 WIB
-### INC-20260713-001: opencode-session-supervisor (RESOLVED)
-**Resolved:** 2026-07-14 04:33 WIB
-### INC-20260712-002: marketing-supervisor OpenClaw Command Failure (RESOLVED)
-**Resolved:** 2026-07-15 04:57 WIB
-### INC-20260711-002: Multi-Service Failure (RESOLVED)
-**Resolved:** 2026-07-13 07:55 WIB
-### INC-20260711-003: Agent Setup Timeout (RESOLVED — MERGED)
-### INC-20260711-001: pr-review-merge-supervisor Provider Timeout (RESOLVED)
-**Resolved:** 2026-07-11 15:46 WIB
-### INC-20260709-001: WorkspaceVanishedError (RESOLVED)
-**Resolved:** 2026-07-11 13:28 WIB
+**Exec/process check failures (5 jobs):**
+- `idx-afternoon-momentum` (7b7f45ac): ps aux grep scheduler.py exit 1
+- `idx-closing-momentum` (b97bdddd): process poll --session gentle-harbor
+- `idx-composed-premarket` (14f3cf4d): ps aux grep scheduler.py exit 1
+- `idx-early-boom` (eec75ad9): process list | grep
+- `idx-midday-intraday` (b53190c7): process list
+
+**Other (4 jobs):**
+- `marketing-supervisor` (516b071c): Exec failed — python3 inline script
+- `idx-backfill-monitor` (b381abeb): Exec failed — pkill → python3
+- `method-weekly-calibrate` (46f873a0): gateway restart interruption (one-time)
+- `Call with Janice reminder` (3af236bc): no channels configured (persistent config issue)
 
 ---
 
-## MONITORING (6 jobs with 1 consecutive error — all transient/known)
+## SYSTEM HEALTH SUMMARY
 
-- `IDX Daily Precompute` (d25afdee): 1 error — exec failed (ps aux grep PID). Transient.
-- `method-weekly-calibrate` (46f873a0): 1 error — gateway restart interruption (old, Jul 9). Next run Jul 18.
-- `Call with Janice reminder` (3af236bc): 1 error — no channels configured. **Persistent, requires human action.**
-- `idx-afternoon-momentum` (7b7f45ac): 1 error — exec failed (ps aux grep). Transient.
-- `idx-closing-momentum` (b97bdddd): 1 error — exec failed (process poll). Transient.
-- `paper-trade-morning-eval` (9c353e13): 1 error — "Agent couldn't generate a response." Monitor.
+**Total jobs:** 60
+**Jobs with 0 errors:** 46 ✅ (76.7%)
+**Jobs with 1 error:** 13 ⚠️ (21.7%)
+**Jobs with ≥2 errors:** 1 🔴 (1.7%)
+**Active incidents:** 1 (INC-20260716-001)
+
+**Trend vs previous scan (09:43 WIB):**
+- 1-error jobs increased: 9 → 13 (+4 new)
+- New 1-error jobs: oss-code-reviewer, marketing-supervisor, idx-backfill-monitor, idx-midday-intraday
+- oss-builder escalated: was 1 error → now 3 errors
+- Overall system health: DEGRADED but not critical
+
+**Assessment:** The "Agent couldn't generate a response" pattern across 4+ jobs suggests a transient model-side issue (glm-4.5-air). The exec/process failures on IDX jobs are likely because market is open and process detection is flaky. No irreversible damage risk.
 
 ---
 
-## SYSTEM HEALTH
+## ACTIONS TAKEN THIS CYCLE
 
-**Total jobs scanned:** 60
-**Jobs with 0 errors:** 53 ✅ (88%)
-**Jobs with 1 error:** 6 ⚠️ (10%)
-**Jobs with ≥2 consecutive errors:** 0 ✅ (0%)
-**Active incidents:** 0 ✅
+1. Successfully ran `cron list --json --all` (previous scan at 10:51 failed — now working)
+2. Identified INC-20260716-001: oss-builder with 3 consecutive model failures
+3. Did NOT auto-heal oss-builder — threshold is ≥5 consecutive errors per protocol
+4. Noted 4 new 1-error jobs since last scan (transient model issues likely)
+5. Updated this state file with full current snapshot
 
-**Overall system health:** HEALTHY — All active incidents resolved. halal-wealth-research-supervisor auto-heal confirmed successful (0 errors after model switch). 88% of jobs fully healthy. Remaining 1-error jobs are transient or require human config change.
+---
 
-**Items to watch next cycle:**
-- Call with Janice reminder: persistent channel config issue (requires human)
-- paper-trade-morning-eval: monitor for escalation to 2+ errors
+## NEXT STEPS
 
-**Current time:** 2026-07-15 21:57 WIB
-**Next scan:** ~22:57 WIB (hourly)
+1. **Next scan:** Re-check oss-builder. If it reaches 5 errors → switch to glm-4.7-flash
+2. **IDX process failures:** Expected during market hours — check if they clear after 15:00 WIB
+3. **"Agent couldn't generate a response" cluster:** If more jobs hit ≥2 errors, consider systemic model issue

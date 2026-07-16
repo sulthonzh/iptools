@@ -1,15 +1,15 @@
 # Guardian State — Meta Supervisor
 
-Last Updated: 2026-07-15T20:18:00+07:00
+Last Updated: 2026-07-16T12:02:00+07:00
 
 ---
 
 ## Active Incidents
 
-### INC-20260708-001: WorkspaceVanishedError — RECURRING (38th occurrence)
+### INC-20260708-001: WorkspaceVanishedError — RECURRING (41st occurrence)
 
 **Pattern**: Attestation files from wealth-lab/oss-lab workspaces contaminate main workspace attestation directory.
-**Status This Cycle**: 🟡 3 contaminated files cleaned (38th occurrence). Directory now clean.
+**Status This Cycle**: 🟡 3 contaminated files cleaned (41st occurrence). Directory now clean.
 **Root Cause**: Gateway-level bug. Multi-agent attestation generation writes to shared directory.
 
 **Pattern History**:
@@ -40,38 +40,52 @@ Last Updated: 2026-07-15T20:18:00+07:00
 - 36th: 2026-07-15T08:08 — 3 files cleaned
 - 37th: 2026-07-15T12:03 — 2 files cleaned
 - 38th: 2026-07-15T20:18 — 3 files cleaned
+- 39th: 2026-07-16T00:06 — 3 files cleaned
+- 40th: 2026-07-16T04:01 — 3 files cleaned (306bbb HEARTBEAT+USER e418ca9a, e617316 USER e418ca9a, ebf4f87a USER e418ca9a)
+- 41st: 2026-07-16T08:19 — 3 files cleaned (306bbb HEARTBEAT+USER ecce5586/e418ca9a, e617316 USER e418ca9a, ebf4f87a USER e418ca9a)
+- 42nd: 2026-07-16T12:02 — 2 files cleaned (306bbb HEARTBEAT+USER ecce5586/e418ca9a, ebf4f87a USER e418ca9a)
 
 **Note**: Contamination continues recurring but is not causing job failures currently. Gateway-level fix still needed.
 
-### INC-20260715-014: halal-wealth-research-supervisor CE=4 — AUTO-FIXED
+### INC-20260716-015: opencode-session-supervisor CE=2 — RECOVERED ✅
 
-**Root Cause**: Model failure — glm-4.5-air AND glm-4.7-flash both timing out (LLM idle timeout 60s).
-**Action Taken**: Switched model glm-4.5-air → glm-5.2 (currently working for other jobs).
-**Status**: 🟢 FIX APPLIED — awaiting next run to confirm recovery (next run ~20:37 WIB).
+**Pattern**: "Agent couldn't generate a response" — transient model capacity issue.
+**Status**: 🟢 Recovered CE=2→0 by 12:01 cycle.
+**Root Cause**: Transient model idle timeout, self-recovered.
 
 ---
 
 ## Resolved Incidents
 
+- INC-20260715-014: halal-wealth-research-supervisor CE=4 — RECOVERED ✅ (2026-07-16T00:06)
 - INC-20260714-013: Supervisor Incident Scanner CE=6 — RECOVERED ✅ (2026-07-15T08:08)
-- INC-20260713-011: opencode-session-supervisor CE=2 — RECOVERED ✅ (was transient)
+- INC-20260713-011: opencode-session-supervisor CE=2 — RECOVERED ✅ (2026-07-15, was transient)
 - INC-20260712-009: daily-report-6am CE=5 — RECOVERED ✅
 - INC-20260711-007: PROVIDER-WIDE OUTAGE — RECOVERED ✅
 - INC-20260712-010: pr-review-merge-supervisor CE=3 — RECOVERED ✅
 
 ---
 
-## Job Health Summary (2026-07-15T20:18)
+## Job Health Summary (2026-07-16T12:02)
 - Total jobs: 60
-- CE=0 (healthy): 52 ✅
-- CE=1 (transient): 6
-  - [Various transient — below escalation threshold]
-- CE>=2 (failing): 2
-  - halal-wealth-research-supervisor CE=4 — **FIX APPLIED** (model → glm-5.2)
-  - opencode-session-supervisor CE=2 — "Agent couldn't generate a response" (transient, watching)
-- Disabled: 1 (Call with Janice reminder — no channel configured)
+- CE=0 (healthy): 47 ✅
+- CE=1 (transient): 13
+  - oss-code-reviewer — exec failed (show tracker.md → python3 inline), transient
+  - marketing-supervisor — exec failed (show json → python3 inline), transient
+  - idx-backfill-monitor — exec failed (pkill → sleep → python3), transient
+  - idx-afternoon-momentum — ps aux grep scheduler.py failed (exit 1), transient
+  - idx-closing-momentum — process poll session failed, transient
+  - paper-trade-morning-eval — agent couldn't generate response, transient
+  - idx-06-precache — agent couldn't generate response, transient
+  - Crypto V3 Morning Scan — agent couldn't generate response, transient
+  - idx-composed-premarket — ps aux grep scheduler.py failed (exit 1), transient
+  - idx-early-boom — process list grep failed, transient
+  - idx-midday-intraday — process list failed, transient
+  - method-weekly-calibrate — interrupted by gateway restart, transient
+  - Call with Janice reminder — disabled (no channel configured)
+- CE>=2 (failing): 0 ✅
 
-**Assessment**: System mostly healthy. halal-wealth-research-supervisor was failing on both fallback models (glm-4.5-air + glm-4.7-flash), switched to glm-5.2 which is currently working for other jobs. opencode-session-supervisor CE=2 is likely transient (same pattern as INC-20260713-011 which self-recovered).
+**Assessment**: System fully healthy — 0 jobs at CE>=2 for 4th time. opencode-session-supervisor recovered (CE=2→0). 13 CE=1 all transient/first-time, mostly IDX market jobs with process check failures (normal during live trading). Several "agent couldn't generate response" errors (3 jobs) — possible transient model capacity issue, not escalating. Market is in midday session (09:00-15:00 WIB). No auto-fixes needed beyond attestation cleanup.
 
 ---
 
@@ -79,14 +93,12 @@ Last Updated: 2026-07-15T20:18:00+07:00
 
 | Job | Action | Details |
 |-----|--------|---------|
-| Attestation cleanup | Removed 3 contaminated files | 38th occurrence INC-20260708-001 |
-| halal-wealth-research-supervisor | Model switched glm-4.5-air → glm-5.2 | CE=4, both fallback models timing out |
+| Attestation cleanup | Removed 2 contaminated files | 42nd occurrence INC-20260708-001 |
 
 ---
 
 ## 🔔 Still Watching
 
-- **opencode-session-supervisor CE=2** — "Agent couldn't generate a response", same transient pattern as before. Watching for self-recovery.
-- **halal-wealth-research-supervisor CE=4** — Fix applied, awaiting next run confirmation.
-- **Attestation contamination** — 38th occurrence, 3 files cleaned. Gateway-level fix still needed.
+- **CE=1 jobs (13 total)**: All transient/first-time. Several IDX jobs have process-check failures during market hours (normal pattern). 3 "agent couldn't generate response" errors — watching for recurrence.
+- **Attestation contamination** — 42nd occurrence, 2 files cleaned. Gateway-level fix still needed.
 - **Plugin version mismatch** — config written by 2026.7.1 but CLI running 2026.6.6. Not causing failures yet but needs `openclaw` update.
