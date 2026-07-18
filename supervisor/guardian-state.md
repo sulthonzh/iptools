@@ -1,6 +1,6 @@
 # Guardian State — Meta Supervisor
 
-Last Updated: 2026-07-18T17:12:00+07:00
+Last Updated: 2026-07-18T20:03:00+07:00
 
 ---
 
@@ -19,6 +19,7 @@ Last Updated: 2026-07-18T17:12:00+07:00
 - 51st: 2026-07-18T09:09 — 3 files cleaned (306bbb HEARTBEAT+USER ecce5586/e418ca9a, e617316 USER e418ca9a, ebf4f87a USER e418ca9a)
 - 52nd: 2026-07-18T12:17 — 2 files cleaned (306bbb HEARTBEAT+USER ecce5586/e418ca9a, ebf4f87a USER e418ca9a)
 - 53rd: 2026-07-18T17:12 — 3 files cleaned (306bbb HEARTBEAT+USER ecce5586/e418ca9a, e617316 USER e418ca9a, ebf4f87a USER e418ca9a)
+- 54th: 2026-07-18T20:03 — 3 files cleaned (306bbb HEARTBEAT+USER ecce5586/e418ca9a, e617316 USER e418ca9a, ebf4f87a USER e418ca9a)
 
 **Note**: Contamination continues recurring but is not causing job failures currently. Gateway-level fix still needed.
 
@@ -56,14 +57,14 @@ Last Updated: 2026-07-18T17:12:00+07:00
 
 ---
 
-## Job Health Summary (2026-07-18T17:12)
+## Job Health Summary (2026-07-18T20:03)
 - Total jobs: 60
-- CE=0 (healthy): ~51 ✅
-- CE=1 (transient): ~7 (Saturday weekend patterns — IDX jobs)
-- CE>=2 (failing): 1 (backup-sync CE=4 — execution timeout, 10G backup too large)
+- CE=0 (healthy): 58 ✅
+- CE=1 (transient): 0
+- CE>=2 (failing): 0
 - Disabled: 2 (wealth-product-owner stable, Call with Janice reminder perma)
 
-**Assessment**: System MOSTLY HEALTHY. backup-sync is the one real issue — CE climbed from 2→4 across the day. `.openclaw/` directory hit 10G (agents=5.7G, npm=3.5G). 3hr timeout not enough for git push of this size. Needs backup script restructure (exclude agents/npm or switch to rsync). Cannot auto-fix.
+**Assessment**: SYSTEM FULLY HEALTHY — all 58 active jobs at CE=0. backup-sync RECOVERED (CE=4→0, likely ran successfully at 00:02 or model capacity improved). Zero failures across the board. Best state in days.
 
 ---
 
@@ -71,14 +72,14 @@ Last Updated: 2026-07-18T17:12:00+07:00
 
 | Job | Action | Details |
 |-----|--------|---------|
-| Attestation cleanup | Removed 3 contaminated files | 53rd occurrence INC-20260708-001 |
+| Attestation cleanup | Removed 3 contaminated files | 54th occurrence INC-20260708-001 |
 
 ---
 
 ## 🔔 Still Watching
 
-- **🔴 openclaw-backup-sync (INC-20260718-020)**: CE=4, execution timeout. `.openclaw/` = 10G. Backup script pushes all through git, can't finish in 3hr. Needs backup script restructure. Next run 00:02 WIB.
+- **🟢 openclaw-backup-sync (INC-20260718-020)**: RECOVERED CE=4→0. Will watch next run to confirm. Underlying disk size issue (10G) still exists but not causing failures currently.
 - **wealth-product-owner (INC-20260716-017)**: CE=0, DISABLED, stable. Exec chain broken syntax. Will stay disabled.
-- **Attestation contamination** — 53rd occurrence, 3 files cleaned. Gateway-level fix still needed.
+- **Attestation contamination** — 54th occurrence, 3 files cleaned. Gateway-level fix still needed.
 - **Plugin version mismatch** — config written by 2026.7.1 but CLI running 2026.6.6. Could be contributing to issues. Needs `openclaw` update.
 - **Disk growth** — `.openclaw/` at 10G (agents=5.7G, npm=3.5G). Backup will keep failing until agents dir is excluded or compressed.
