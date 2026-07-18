@@ -1,0 +1,10 @@
+🧹 CODE QUALITY — awesome-go
+Phase: A → B
+Type: 📄 Other (Go curated list)
+Status: 🔧 FIXED [6 patterns added]
+Changes:
+- Added Go/IDE patterns to .gitignore: .DS_Store, vendor/, *.swp, *.swo, .idea/, .vscode/
+- No tracked artifacts found (expected for README-only repo)
+- Best practices verified: README.md exists (1609 lines), LICENSE exists
+Inventory: 327 repos scanned, 187 clean, 61 fixed, 6 blocked, 73 remaining
+Next: beego Phase A

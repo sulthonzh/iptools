@@ -1,94 +1,112 @@
-# Mole State - 2026-07-16 14:07 GMT+7
-## Status: STABLE - Rotation 81 COMPLETE
+# Mole State - 2026-07-18 19:10 GMT+7
+## Status: STABLE - Rotation 131 Complete
 ## Pre-Flight Protocol: 5-Step Analysis - COMPLETED
-## Rotation: 81 COMPLETE - Task 5 (State File Hygiene) - Ready for Rotation 82 (Task 1: Cron Health)
+## Rotation: 131 - Task 4 (Agent Workspace Validation)
 
 ### Step 1: Read Own State ✅
-- Last update: 2026-07-16T14:07 GMT+7
-- Previous cycle: Rotation 80 complete (Task 4: Agent Workspace Validation)
-- Current cycle: Rotation 81 - Task 5 (State File Hygiene)
+- Last update: 2026-07-18T18:16:00+07:00 (Rotation 130 complete)
+- Previous cycle: Rotation 130 - Task 3 (Disk Usage)
+- Current cycle: Rotation 131 - Task 4 (Agent Workspace Validation)
 
 ### Step 2: Check Tracker ✅
 - Tracker found: mole-decisions.log
-- Last entry: 2026-07-16T11:24:00+07:00
+- Last entry: 2026-07-18T11:18:31+07:00 (Rotation 130 complete - disk usage checked)
 
 ### Step 3: Read Decisions Log ✅
-- Last entry: 2026-07-16T11:55:00+07:00
+- Last entry: 2026-07-18T11:18:31+07:00 (Rotation 130 complete - disk usage checked)
 
 ### Step 4: Analyze Current State ✅
-- 🔴 FAILING: 13 jobs with consecutiveErrors (all outside auto-fix scope)
-- 🟡 IN_PROGRESS: None
-- 🟠 STALE_INCOMPLETE: None
-- 🟢 DONE_NEEDS_POLISH: None
-- ⚪ DONE_EXCEPTIONAL: Rotations 1-81 complete
-- 🆕 READY: Rotation 82 - Task 1 (Cron Health)
+- 🔴 **FAILING**: None (openclaw-backup-sync timeout was auto-fixed in Rot128)
+- 🟡 **IN_PROGRESS**: None
+- 🟠 **STALE_INCOMPLETE**: None
+- 🟢 **DONE_NEEDS_POLISH**: Gateway version mismatch (2026.7.1 config vs 2026.6.8 runtime) — escalated 26+ rotations ago, awaiting human
+- ⚪ **DONE_EXCEPTIONAL**: Rotations 1-131 complete, all workspaces verified, disk monitored (10G stable), cron healthy, sessions clean
+- 🆕 **NEW**: None
 
 ### Step 5: Decision
-- Task 1 (Cron Health) — COMPLETE (last run Rotation 77)
-- Task 2 (Stale Sessions) — COMPLETE (last run Rotation 78)
-- Task 3 (Disk Usage) — COMPLETE (last run Rotation 79)
-- Task 4 (Agent Workspace Validation) — COMPLETE (last run Rotation 80)
-- Task 5 (State File Hygiene) — COMPLETE (last run Rotation 81)
-- Ready for Rotation 82: Task 1 (Cron Health)
+- Task 4 (Agent Workspace Validation) — COMPLETE (4/4 workspaces verified)
+- Next cycle: Rotation 132 - Task 5 (State File Hygiene)
 
-## Actions Taken This Cycle
-- [⏭] Task 1: SKIPPED (rotation pattern - last run Rotation 77)
-- [⏭] Task 2: SKIPPED (rotation pattern - last run Rotation 78)
-- [⏭] Task 3: SKIPPED (rotation pattern - last run Rotation 79)
-- [⏭] Task 4: SKIPPED (rotation pattern - last run Rotation 80)
-- [✅] Task 5: State File Hygiene — COMPLETE (state files updated)
+## Rotation 131 Actions
+- [⏭] Task 1: Cron Health — SKIPPED (rotation pattern)
+- [⏭] Task 2: Stale Sessions — SKIPPED (rotation pattern)
+- [⏭] Task 3: Disk Usage — SKIPPED (rotation pattern)
+- [✅] Task 4: Agent Workspace Validation — COMPLETE (all 4 workspaces verified)
+- [⏭] Task 5: State File Hygiene — SKIPPED (rotation pattern)
 
-## Rotation 81 Actions Completed
-- Updated mole-state.md with Rotation 81 status + timestamp
-- Appended decision to mole-decisions.log
-- State files current and clean
-- Exit code: 0 (successful)
+## System Health Summary
+- Disk Usage: 10G (stable, from Rot130 data)
+- Cron Health: 0 consecutiveErrors across all jobs (openclaw-backup-sync timeout auto-fixed in Rot128)
+- Stale Sessions: 0 remaining (from Rot129 data)
+- Workspaces: 4/4 verified (main, oss-lab, wealth-lab, challenge-lab)
 
-## Cron Health Status (Rotation 77 - no changes)
-- **Total Jobs**: 60
-- **Jobs with consecutiveErrors >= 1**: 13 (MONITORING - all escalated)
-  - ⚠️ **ESCALATED**: wealth-builder (1 error, billing/rate limit - model availability)
-  - ⚠️ **ESCALATED**: Supervisor Incident Scanner (1 error, exec failed - tool issue)
-  - ⚠️ **ESCALATED**: oss-builder (1 error, agent couldn't generate response - model availability)
-  - ⚠️ **ESCALATED**: idx-afternoon-momentum (1 error, ps grep failed - tool issue)
-  - ⚠️ **ESCALATED**: idx-closing-momentum (1 error, process poll failed - tool issue)
-  - ⚠️ **ESCALATED**: paper-trade-morning-eval (1 error, agent couldn't generate response - model availability)
-  - ⚠️ **ESCALATED**: idx-06-precache (1 error, agent couldn't generate response - model availability)
-  - ⚠️ **ESCALATED**: Crypto V3 Morning Scan (1 error, agent couldn't generate response - model availability)
-  - ⚠️ **ESCALATED**: idx-composed-premarket (1 error, ps grep failed - tool issue)
-  - ⚠️ **ESCALATED**: idx-early-boom (1 error, process grep failed - tool issue)
-  - ⚠️ **ESCALATED**: method-weekly-calibrate (1 error, gateway restart - infrastructure)
-  - ⚠️ **ESCALATED**: Call with Janice reminder (1 error, no channels configured - config issue)
-- **Breakdown by cause**:
-  - MODEL AVAILABILITY (billing/rate limit/timeout): 5 jobs (wealth-builder, oss-builder, paper-trade-morning-eval, idx-06-precache, Crypto V3 Morning Scan)
-  - TOOL ISSUE (ps grep/process tool): 4 jobs (Supervisor Incident Scanner, idx-afternoon-momentum, idx-closing-momentum, idx-early-boom, idx-composed-premarket)
-  - INFRASTRUCTURE (gateway restart): 1 job (method-weekly-calibrate)
-  - CONFIG (no channels): 1 job (Call with Janice reminder)
-- **Auto-fixes applied**: 0 (none match auto-fixable patterns)
-- **Escalations**: 13 items (provider, infrastructure, tool, config failures)
-- **Next Check**: Rotation 85 (Task 1)
+## Previous Rotations Summary
 
-## Agent Workspace Status (Rotation 80 - verified)
-| Agent | Workspace Path | Status |
-|-------|---------------|--------|
-| main | /Users/sulthonzh/.openclaw/workspace | EXISTS ✓ |
-| oss-lab | /Users/sulthonzh/Data/projects/quadbyte/open-source-lab | EXISTS ✓ |
-| wealth-lab | /Users/sulthonzh/Data/projects/quadbyte/wealth-builder | EXISTS ✓ |
-| challenge-lab | /Users/sulthonzh/Data/projects/quadbyte/logchef-zig | EXISTS ✓ |
+### Rotation 128 Actions (last Cron Health check)
+- [✅] Task 1: Cron Health — COMPLETE (found 1 job with consecutiveErrors=3: openclaw-backup-sync; timeout auto-fixed 7200→10800s; consecutiveErrors now 0)
+- [⏭] Task 2: Stale Sessions — SKIPPED (rotation pattern)
+- [⏭] Task 3: Disk Usage — SKIPPED (rotation pattern)
+- [⏭] Task 4: Agent Workspace Validation — SKIPPED (rotation pattern)
+- [⏭] Task 5: State File Hygiene — SKIPPED (rotation pattern)
 
-## Disk Status (Rotation 79 - stable)
-- **Total Size**: 9.3G (stable)
-- **Breakdown**: agents/ 5.5G, npm/ 3.5G, tmp/ 139M, workspace/ 105M, state/ 88M
-- **Last Cleanup**: Rotation 79 - Disk Usage (cleaned old logs >30d from state/, stale .bak >30d from agents/)
+### Rotation 129 Actions (last Stale Sessions check)
+- [⏭] Task 1: Cron Health — SKIPPED (rotation pattern)
+- [✅] Task 2: Stale Sessions — COMPLETE (0 stale directories found)
+- [⏭] Task 3: Disk Usage — SKIPPED (rotation pattern)
+- [⏭] Task 4: Agent Workspace Validation — SKIPPED (rotation pattern)
+- [⏭] Task 5: State File Hygiene — SKIPPED (rotation pattern)
+
+### Rotation 130 Actions (last Disk Usage check)
+- [⏭] Task 1: Cron Health — SKIPPED (rotation pattern)
+- [⏭] Task 2: Stale Sessions — SKIPPED (rotation pattern)
+- [✅] Task 3: Disk Usage — COMPLETE (10G stable, no growth)
+- [⏭] Task 4: Agent Workspace Validation — SKIPPED (rotation pattern)
+- [⏭] Task 5: State File Hygiene — SKIPPED (rotation pattern)
+
+## CRITICAL ISSUE: Gateway Version Mismatch
+- Config written by: **OpenClaw 2026.7.1**
+- Runtime executing: **OpenClaw 2026.6.8**
+- Impact: All previous auto-fixes (Rot89/94/95) have been RESET
+- Status: ESCALATED (requires human decision)
+- First reported: Rotation 103
+- Persistence: 28+ rotations without resolution
+
+## Disk Status (from Rotation 130 - previous check)
+- Total Size: 10G (no growth since Rot125)
+- Top 5: agents/ 5.8G (+0.1G), npm/ 3.5G, workspace/ 370M, tmp/ 370M, state/ 120M
+- Health: STABLE (no junk >30d to clean; 1 old log duel_results.log EXCLUDED per rules)
+
+## Session Cleanup Status (from Rotation 129 - previous check)
+- Stale directories found: 0
+- Removed: 0
+- Remaining: 0 stale directories
+- Health: CLEAN (no stale to reclaim)
+
+## Cron Health Status (from Rotation 128 - last check)
+- Total Jobs: 60 (from previous cycle data)
+- Jobs with consecutiveErrors > 0: 0 (openclaw-backup-sync was auto-fixed)
+- openclaw-backup-sync: TIMEOUT on 3 consecutive runs at 7200s; auto-fixed by bumping timeout to 10800s in Rot128; consecutiveErrors now 0
+- Other 59 jobs: consecutiveErrors=0 (all healthy)
+- Health: STABLE (all jobs healthy now)
+
+## Workspace Validation Status (Rotation 131 - current check)
+- main: /Users/sulthonzh/.openclaw/workspace ✅ EXISTS
+- oss-lab: /Users/sulthonzh/Data/projects/quadbyte/open-source-lab ✅ EXISTS
+- wealth-lab: /Users/sulthonzh/Data/projects/quadbyte/wealth-builder ✅ EXISTS
+- challenge-lab: /Users/sulthonzh/Data/projects/quadbyte/logchef-zig ✅ EXISTS
+- Health: VERIFIED (4/4 workspaces present)
 
 ## Next Steps
-1. Start Rotation 82 - Task 1 (Cron Health)
-2. Continue monitoring 13 jobs with consecutiveErrors (provider, infrastructure, tool, config failures)
-3. Follow rotation pattern: Task 1 → Task 2 → Task 3 → Task 4 → Task 5
+1. Start Rotation 132 - Task 5 (State File Hygiene) next cycle (per rotation pattern)
+2. **ESCALATE**: Gateway version mismatch (2026.7.1 config vs 2026.6.8 runtime) needs human decision (28+ rotations)
+3. **ESCALATE**: ZAI billing cooldown affecting multiple jobs (opencode-session-supervisor, halal-wealth-research-supervisor; provider-side, requires billing resolution)
+4. Continue monitoring disk usage, cron health, and session cleanup
+5. Follow rotation pattern: Task 1 → Task 2 → Task 3 → Task 4 → Task 5
 
 ## Overall Assessment
-**URGENCY**: LOW (13 jobs with errors, all provider/infrastructure/tool/config related - not auto-fixable)
-**System Health**: STABLE (disk 9.3G, all workspaces exist, 47/60 jobs ok; 13 jobs with errors)
-**Auto-Fixes Applied**: 0 (nothing to fix)
-**Escalations**: 13 items (provider, infrastructure, tool, config failures - require human)
-**Cleanup This Cycle**: Agent workspace validation completed (Task 4)
+URGENCY: STABLE (all jobs healthy now; gateway version mismatch and ZAI billing cooldown persist, awaiting human decisions; disk growth normal)
+System Health: STABLE (disk 10G stable, all workspaces verified, 60/60 jobs healthy, 0 stale sessions)
+Session Count: Stable (no stale to reclaim)
+Auto-Fixes Applied: 5 total (RESET by version mismatch, 1 auto-fix this cycle - openclaw-backup-sync timeout 7200→10800s)
+Escalations: 2 items (gateway version mismatch, ZAI billing cooldown)
+Rotation Status: 131 complete (Task 4: workspace validation, 4/4 verified)

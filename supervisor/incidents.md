@@ -1,75 +1,140 @@
 # Supervisor Incident Scanner State
 
-Last updated: 2026-07-16 11:44 WIB
+Last updated: 2026-07-18 18:59 WIB
 
 ## ACTIVE INCIDENTS
 
-### INC-20260716-001 — oss-builder model failure (3 consecutive errors)
-- **Affected jobs:** oss-builder (372e2507)
-- **Root cause:** Model failure — "Agent couldn't generate a response" on glm-4.5-air
-- **Error pattern:** Agent unable to generate response. Started after 2 successful runs at 08:57 WIB. Failures began at 09:49 WIB.
-- **Consecutive errors:** 3
-- **Status:** ACTIVE — monitoring. Auto-heal threshold is ≥5; will switch to fallback model (glm-4.7-flash) if it hits 5.
-- **First seen:** 2026-07-16 09:49 WIB
-- **Last seen:** 2026-07-16 11:09 WIB (approx, based on hourly schedule)
+### INC-20260718-001 — openclaw-backup-sync timeout + gateway interruption (ACTIVE 🔴 — ESCALATE)
+- **Affected jobs:** openclaw-backup-sync (5772e091)
+- **First seen:** 2026-07-18 06:13 WIB
+- **Last seen:** 2026-07-18 17:46 WIB
+- **consecutiveErrors:** 5 (was 4 last cycle → ESCALATION THRESHOLD HIT)
+- **Last duration:** 1976466ms (~33 min — this run was killed by gateway restart, NOT timeout)
+- **Timeout setting:** 10800s (bumped by prior cycle, but timeout runs still died at ~7200s)
+- **Root cause:** MIXED — (1) Execution timeout for long backup runs (26G, 548K files), (2) Latest failure was gateway restart interruption. Timeout bump to 10800s proven ineffective — 3 prior runs died at exactly ~7200s suggesting gateway-level cap.
+- **Error message (latest):** `cron: job interrupted by gateway restart`
+- **Error message (prior 4):** `cron: job execution timed out`
+- **Next run:** 2026-07-18 22:22 WIB (nextRunAtMs: 1784394120000)
+- **Classification:** Infrastructure — gateway timeout cap + gateway restart. Auto-heal exhausted (timeout bump failed).
+- **Auto-heal status:** ❌ EXHAUSTED. Timeout bump to 10800s did not help. At 5 consecutive errors.
+- **Status:** 🔴 ESCALATE — needs human investigation.
+- **Recommended human actions:**
+  1. Investigate gateway max timeout cap (suspected 7200s/2h limit)
+  2. Implement incremental backups (rsync with hardlinks)
+  3. Exclude `.git` objects pack files from backup
+  4. Split into multiple smaller cron jobs
+  5. Check if gateway restart at 17:46 was planned maintenance
+
+### INC-20260718-002 — Crypto V3 Morning Scan agent failure (ACTIVE 🟡 — STABLE)
+- **Affected jobs:** Crypto V3 Morning Scan (79e66b9f)
+- **First seen:** 2026-07-18 06:07 WIB
+- **consecutiveErrors:** 3 (unchanged — no new runs since last scan)
+- **Next run:** 2026-07-19 06:06 WIB
+- **Root cause:** Agent execution failure — model couldn't generate response
+- **Error message:** `⚠️ Agent couldn't generate a response. Note: some tool actions may have already been executed — please verify before retrying.`
+- **Model note:** Job on `zai-coding-plan/glm-5.1`. Cross-model failure.
+- **Classification:** Agent/provider failure — will auto-heal at ≥5 by switching to glm-4.7-flash.
+- **Status:** ACTIVE — monitoring. 2 more errors → auto-switch model.
 
 ---
 
-## MONITORING (1 error — watch list)
+## RESOLVED INCIDENTS (THIS CYCLE)
 
-**13 jobs with 1 consecutive error (up from 9 at 09:43 scan):**
+### INC-20260718-003 — wealth-builder exec + billing failures (RESOLVED ✅)
+- **Resolution:** consecutiveErrors dropped from 2 → 0. Last run successful (194s duration).
+- **Root cause was intermittent:** ZAI billing 429s and exec failures self-resolved.
+- **Resolved at:** 2026-07-18 ~18:59 WIB
 
-**Model response failures (4 jobs):**
-- `paper-trade-morning-eval` (9c353e13): "Agent couldn't generate a response"
-- `idx-06-precache` (bb14122f): "Agent couldn't generate a response"
-- `Crypto V3 Morning Scan` (79e66b9f): "Agent couldn't generate a response"
-- `oss-code-reviewer` (b0091acb): Exec failed — python3 heredoc in tracker
+---
 
-**Exec/process check failures (5 jobs):**
-- `idx-afternoon-momentum` (7b7f45ac): ps aux grep scheduler.py exit 1
-- `idx-closing-momentum` (b97bdddd): process poll --session gentle-harbor
-- `idx-composed-premarket` (14f3cf4d): ps aux grep scheduler.py exit 1
-- `idx-early-boom` (eec75ad9): process list | grep
-- `idx-midday-intraday` (b53190c7): process list
+## RESOLVED INCIDENTS (PRIOR CYCLES)
 
-**Other (4 jobs):**
-- `marketing-supervisor` (516b071c): Exec failed — python3 inline script
-- `idx-backfill-monitor` (b381abeb): Exec failed — pkill → python3
-- `method-weekly-calibrate` (46f873a0): gateway restart interruption (one-time)
-- `Call with Janice reminder` (3af236bc): no channels configured (persistent config issue)
+### INC-20260717-007 — Crypto V3 Morning Scan agent failure (RESOLVED → REGRESSED to INC-20260718-002)
+### INC-20260717-003 — ZAI provider rate limit + timeout cluster (RESOLVED ✅)
+### INC-20260717-004 — IDX daily-rankings process kill failure (RESOLVED ✅)
+### INC-20260717-006 — openclaw-backup-sync execution timeout (RESOLVED → REGRESSED to INC-20260718-001)
+### INC-20260717-005 — Crypto V3 Morning Scan agent failure (MERGED → INC-20260717-007)
+### INC-20260717-001 — ZAI provider instability cluster (RESOLVED → EVOLVED to INC-20260717-003)
+### INC-20260717-002 — Supervisor toolchain failures (RESOLVED → MERGED into INC-20260717-003)
+### INC-20260716-004 — wealth-product-owner persistent failures (RESOLVED ✅)
+### INC-20260716-002 — Model cascade failure cluster (RESOLVED → regressed → evolved)
+### INC-20260716-005 — IDX EOD processing failures (RESOLVED → regressed → evolved)
+### INC-20260716-007 — pr-review-merge-supervisor PR merge blocked (RESOLVED ✅)
+### INC-20260716-006 — oss-builder exec failures (RESOLVED → regressed → INC-20260717-003)
+
+---
+
+## TRANSIENT NOISE (1-ERROR JOBS — BELOW THRESHOLD, NOT INCIDENTS)
+
+**6 jobs — gateway restart at ~17:46 WIB** (single event, transient):
+- code-quality-supervisor, oss-code-reviewer, deployment-supervisor, marketing-supervisor, pr-review-merge-supervisor, challenge-hunter
+
+**5 jobs — "Agent couldn't generate a response"** (possible correlated with gateway instability):
+- Crypto V3 Afternoon Scan, idx-morning-review, idx-duel-evaluate, idx-opening-gap, idx-weekly-position
+
+**3 jobs — specific errors:**
+- method-daily-record: exec failed (python3 inline script, repo issue)
+- idx-midday-update: exec failed (file listing issue)
+- Call with Janice reminder: no channel configured
+
+All at 1 error — no action taken per false alarm prevention rules.
+
+---
+
+## MONITORING
+
+| Job | consecutiveErrors | Threshold for action | Notes |
+|---|---|---|---|
+| openclaw-backup-sync | 5 | ≥5 → ESCALATE | Timeout bump failed. Mixed timeout + gateway restart. ESCALATING. |
+| Crypto V3 Morning Scan | 3 | ≥5 → switch model | Stable, next run tomorrow 06:06. |
 
 ---
 
 ## SYSTEM HEALTH SUMMARY
 
 **Total jobs:** 60
-**Jobs with 0 errors:** 46 ✅ (76.7%)
-**Jobs with 1 error:** 13 ⚠️ (21.7%)
-**Jobs with ≥2 errors:** 1 🔴 (1.7%)
-**Active incidents:** 1 (INC-20260716-001)
+**Jobs with 0 errors:** 44 (73.3%)
+**Jobs with 1 error:** 14 (23.3%) — mostly transient gateway restart noise
+**Jobs with ≥2 errors:** 2 (3.3%)
 
-**Trend vs previous scan (09:43 WIB):**
-- 1-error jobs increased: 9 → 13 (+4 new)
-- New 1-error jobs: oss-code-reviewer, marketing-supervisor, idx-backfill-monitor, idx-midday-intraday
-- oss-builder escalated: was 1 error → now 3 errors
-- Overall system health: DEGRADED but not critical
+**Active incidents:** 2 (1 ESCALATED, 1 monitoring)
+**Resolved this cycle:** 1 (INC-20260718-003 wealth-builder ✅)
+**New incidents:** 0
 
-**Assessment:** The "Agent couldn't generate a response" pattern across 4+ jobs suggests a transient model-side issue (glm-4.5-air). The exec/process failures on IDX jobs are likely because market is open and process detection is flaky. No irreversible damage risk.
+**Assessment:** Backup-sync hit escalation threshold (5 errors). Wealth-builder resolved. 14 jobs at 1 error are transient gateway restart noise — expected to self-recover on next run. Fleet fundamentally healthy except for backup-sync.
 
----
-
-## ACTIONS TAKEN THIS CYCLE
-
-1. Successfully ran `cron list --json --all` (previous scan at 10:51 failed — now working)
-2. Identified INC-20260716-001: oss-builder with 3 consecutive model failures
-3. Did NOT auto-heal oss-builder — threshold is ≥5 consecutive errors per protocol
-4. Noted 4 new 1-error jobs since last scan (transient model issues likely)
-5. Updated this state file with full current snapshot
+**Trend:** INC-001 worsening (needs human), INC-002 stable, INC-003 resolved. Gateway restart caused batch of 1-error noise across 14 jobs.
 
 ---
 
-## NEXT STEPS
+## ACTIONS TAKEN THIS CYCLE (18:59 WIB)
 
-1. **Next scan:** Re-check oss-builder. If it reaches 5 errors → switch to glm-4.7-flash
-2. **IDX process failures:** Expected during market hours — check if they clear after 15:00 WIB
-3. **"Agent couldn't generate a response" cluster:** If more jobs hit ≥2 errors, consider systemic model issue
+1. ✅ Read state file from previous cycle (17:46 WIB)
+2. ✅ Ran STATE-AWARE PROTOCOL pre-flight (5 steps)
+3. ✅ Scanned all 60 cron jobs via `openclaw cron list --json --all`
+4. ✅ Identified 2 jobs at ≥2 errors: openclaw-backup-sync (5, was 4), Crypto V3 Morning Scan (3, unchanged)
+5. ✅ Checked wealth-builder — RESOLVED (0 errors, last run OK)
+6. ✅ Noted 14 jobs at 1 error — all transient (6 gateway restart, 5 agent response, 3 specific)
+7. ✅ Identified gateway restart event at ~17:46 WIB causing batch failures
+8. ❌ No auto-heal triggered:
+   - backup-sync at 5 errors: timeout bump already exhausted in prior cycles. ESCALATING.
+   - Crypto V3 at 3 errors: below ≥5 threshold.
+9. ✅ Resolved INC-20260718-003 (wealth-builder)
+10. ✅ Updated state file
+
+---
+
+## ESCALATION NOTES
+
+### 🔴 openclaw-backup-sync — ESCALATION FOR HUMAN INVESTIGATION
+**Status:** 5 consecutive errors. Auto-heal exhausted.
+**Finding:** Timeout bump to 10800s was applied but ineffective — timeout runs still die at ~7200s (gateway cap suspected). Latest run killed by gateway restart instead of timeout.
+**Pattern:**
+- Runs 1-4: timeout at ~7200s despite 10800s config
+- Run 5: killed by gateway restart at ~33min (1976s)
+**Recommended actions (in priority order):**
+1. **Investigate gateway max timeout cap** — check if OpenClaw gateway has a hard 7200s limit that overrides job config
+2. **Implement incremental backups** — full 26G/548K-file backup cannot complete in <2h window
+3. **Exclude large directories** — `.git/objects/pack/` is likely the biggest contributor
+4. **Split into multiple smaller jobs** — e.g., separate workspace, projects, configs
+5. **Use rsync with --delete and hardlinks** for efficient incremental sync
