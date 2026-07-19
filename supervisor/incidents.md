@@ -1,128 +1,134 @@
 # Supervisor Incident Scanner State
 
-Last updated: 2026-07-18 19:43 WIB
+Last updated: 2026-07-19 09:46 WIB
 
 ## ACTIVE INCIDENTS
 
-### INC-20260718-001 — openclaw-backup-sync timeout + gateway interruption (ACTIVE 🔴 — ESCALATE)
-- **Affected jobs:** openclaw-backup-sync (5772e091)
-- **First seen:** 2026-07-18 06:13 WIB
-- **Last seen:** 2026-07-18 17:46 WIB
-- **consecutiveErrors:** 5 (unchanged — no new runs since last cycle)
-- **Last duration:** 1976466ms (~33 min — killed by gateway restart, NOT timeout)
-- **Timeout setting:** 7200s (was bumped to 10800s in prior cycles but apparently reverted or capped)
-- **Root cause:** MIXED — (1) Execution timeout for long backup runs (26G, 548K files), (2) Latest failure was gateway restart interruption. Timeout bump proven ineffective — prior runs died at ~7200s suggesting gateway-level cap.
-- **Error message (latest):** `cron: job interrupted by gateway restart`
-- **Error message (prior 4):** `cron: job execution timed out`
-- **Next run:** 2026-07-18 22:22 WIB
-- **Classification:** Infrastructure — gateway timeout cap + gateway restart. Auto-heal exhausted.
-- **Auto-heal status:** ❌ EXHAUSTED. At 5 consecutive errors.
-- **Status:** 🔴 ESCALATED — awaiting human investigation.
-- **Recommended human actions:**
-  1. Investigate gateway max timeout cap (suspected 7200s/2h limit)
-  2. Implement incremental backups (rsync with hardlinks)
-  3. Exclude `.git` objects pack files from backup
-  4. Split into multiple smaller cron jobs
-  5. Check if gateway restart at 17:46 was planned maintenance
+### INC-20260719-009 — ZAI provider transient capacity strain (ACTIVE 🟡 — MONITORING)
+- **Affected jobs:** wealth-builder (fd2ea97b ce:1), oss-builder (372e2507 ce:1)
+- **Root cause:** ZAI provider capacity strain — glm-5.1 hit billing limit (429 余额不足), glm-4.5-air and glm-4.7-flash both timed out (60s idle timeout)
+- **Error (wealth-builder):** `All models failed (3): zai/glm-5.1: 429 余额不足或无可用资源包,请充值 (billing) | glm-4.5-air: LLM idle timeout (60s) | glm-4.7-flash: 429 Rate limit reached`
+- **Error (oss-builder):** `All models failed (3): glm-5.2: LLM idle timeout (60s) | glm-4.5-air: LLM idle timeout (60s) | glm-4.7-flash: LLM idle timeout (60s)`
+- **First seen:** 2026-07-19 09:44 WIB (both jobs failed within seconds of each other)
+- **Status:** MONITORING — ce:1 on both. 8/10 other jobs in the same window succeeded. This session itself runs on glm-5.2 without issues. Likely transient capacity/rate limit strain on ZAI provider, NOT a full outage.
+- **Actions taken:** None. Model swap won't help (fallbacks already exhausted). ce < 2, no auto-heal threshold met.
+- **Next runs:** wealth-builder ~09:53 WIB, oss-builder scheduled but less frequent.
+- **Note:** The glm-5.1 billing error (余额不足) is concerning — if ZAI account balance is depleted, this will cascade to all glm-5.1 jobs. Watch for ce escalation on next runs.
 
-### INC-20260718-002 — Crypto V3 Morning Scan agent failure (ACTIVE 🟡 — STABLE)
+### INC-20260719-002 — Crypto V3 Morning Scan agent generation failure (ACTIVE 🟡 — MONITORING)
 - **Affected jobs:** Crypto V3 Morning Scan (79e66b9f)
-- **First seen:** 2026-07-18 06:07 WIB
-- **consecutiveErrors:** 3 (unchanged — no new runs since last scan)
-- **Next run:** 2026-07-19 06:06 WIB
-- **Root cause:** Agent execution failure — model couldn't generate response
-- **Error message:** `⚠️ Agent couldn't generate a response. Note: some tool actions may have already been executed — please verify before retrying.`
-- **Model:** zai-coding-plan/glm-5.1
-- **Classification:** Agent/provider failure — will auto-heal at ≥5 by switching model.
-- **Status:** ACTIVE — monitoring. 2 more errors → auto-switch to glm-4.5-air.
+- **Root cause:** Agent can't generate response — NOT model-specific (fails on both glm-5.1 AND glm-4.5-air fallback)
+- **Error:** `Agent couldn't generate a response. Note: some tool actions may have already been executed`
+- **consecutiveErrors:** 3 (unchanged — no new run since Jul 18)
+- **First seen:** 2026-07-16
+- **Last seen:** 2026-07-18 06:12 WIB
+- **Next run:** 2026-07-20 06:06 WIB
+- **Status:** MONITORING — ce < 5, model swap won't help since already failing on fallback model. Runs once/day so ce grows slowly.
+- **Actions taken:** None. Root cause appears to be prompt complexity/tool interaction, not model capability.
+- **Note:** If ce hits 5, no effective auto-heal available.
+
+### INC-20260719-004 — "Agent couldn't generate response" cluster (ACTIVE 🟡 — STABLE at ce:1)
+- **Affected jobs (5):** idx-morning-review (ce:1), idx-duel-evaluate (ce:1), idx-opening-gap (ce:1), idx-weekly-position (ce:1), Crypto V3 Afternoon Scan (ce:1)
+- **Root cause:** Same error pattern as INC-20260719-002 — agent fails to generate response. Likely systemic gateway v2026.6.8 incompatibility.
+- **consecutiveErrors:** All at 1
+- **First seen:** 2026-07-18
+- **Status:** STABLE — Sunday, IDX jobs won't run (market closed). Monday will be the real test.
+- **Note:** These 5 IDX jobs last ran Jul 17-18 (Fri/Sat). Monday Jul 20 runs will show if this self-resolves.
+
+### INC-20260719-006 — Edit tool failures (ACTIVE 🟡 — STABLE)
+- **Affected jobs (2):** oss-code-reviewer (ce:1), deployment-supervisor (ce:1)
+- **Root cause:** Edit tool failing — `⚠️ 📝 Edit: ... failed`
+- **consecutiveErrors:** Both at 1 (unchanged)
+- **First seen:** 2026-07-19 ~02:00-02:20 WIB
+- **Status:** STABLE — no new Edit tool failures, no escalation.
+- **Actions taken:** None. Both ce:1, likely transient.
+
+### INC-20260719-007 — Exec pipeline failures (ACTIVE 🟡 — STABLE)
+- **Affected jobs:** method-daily-record (ce:1), idx-midday-update (ce:1)
+- **Root cause:** Various exec failures (different root causes)
+- **consecutiveErrors:** Both at 1 (unchanged)
+- **Status:** STABLE — transient exec failures at ce:1.
+
+### INC-20260719-008 — code-quality-supervisor Message failure (ACTIVE 🟡 — STABLE)
+- **Affected jobs:** code-quality-supervisor (19429af5)
+- **Root cause:** Delivery/messaging failure — `⚠️ ✉️ Message failed`
+- **consecutiveErrors:** 1 (unchanged)
+- **First seen:** 2026-07-19 ~04:46 WIB
+- **Status:** STABLE — delivery config issue, not actionable by incident scanner.
 
 ---
 
-## RESOLVED INCIDENTS
+## RECENTLY RESOLVED
 
+### INC-20260719-001 — openclaw-backup-sync timeout (RESOLVED ✅ — 2026-07-19 09:35)
+- **Resolution:** Timeout bump to 14400s (4h) worked. Job ran successfully at 06:02 WIB Jul 19, completed in 199 minutes (3h19m).
+- **CE trajectory:** 6→0
+
+### INC-20260719-005 — marketing-supervisor exec failure (RESOLVED ✅)
+### INC-20260719-003 — wealth-builder exec failure (RESOLVED ✅)
+### INC-20260718-004 — marketing-supervisor exec failure (RESOLVED ✅)
 ### INC-20260718-003 — wealth-builder exec + billing failures (RESOLVED ✅)
-- **Resolution:** consecutiveErrors dropped from 2 → 0. Last run successful.
-- **Resolved at:** 2026-07-18 ~18:59 WIB
+### INC-20260718-001 — openclaw-backup-sync timeout (RESOLVED → REGRESSED → FINALLY RESOLVED as INC-20260719-001)
+### INC-20260718-002 — Crypto V3 Morning Scan agent failure (RESOLVED → REGRESSED to INC-20260719-002)
 
-### INC-20260717-007 — Crypto V3 Morning Scan agent failure (RESOLVED → REGRESSED to INC-20260718-002)
-### INC-20260717-003 — ZAI provider rate limit + timeout cluster (RESOLVED ✅)
+---
+
+## RESOLVED INCIDENTS (HISTORY)
+
+### INC-20260717-007 — Crypto V3 Morning Scan (RESOLVED → REGRESSED)
+### INC-20260717-006 — openclaw-backup-sync timeout (RESOLVED → REGRESSED → FINALLY RESOLVED)
+### INC-20260717-003 — ZAI provider rate limit cluster (RESOLVED ✅)
 ### INC-20260717-004 — IDX daily-rankings process kill failure (RESOLVED ✅)
-### INC-20260717-006 — openclaw-backup-sync execution timeout (RESOLVED → REGRESSED to INC-20260718-001)
-### INC-20260717-005 — Crypto V3 Morning Scan agent failure (MERGED → INC-20260717-007)
-### INC-20260717-001 — ZAI provider instability cluster (RESOLVED → EVOLVED to INC-20260717-003)
-### INC-20260717-002 — Supervisor toolchain failures (RESOLVED → MERGED into INC-20260717-003)
+### INC-20260717-005 — Crypto V3 Morning Scan (MERGED)
+### INC-20260717-001 — ZAI provider instability cluster (RESOLVED)
+### INC-20260717-002 — Supervisor toolchain failures (RESOLVED)
 ### INC-20260716-004 — wealth-product-owner persistent failures (RESOLVED ✅)
-### INC-20260716-002 — Model cascade failure cluster (RESOLVED → regressed → evolved)
-### INC-20260716-005 — IDX EOD processing failures (RESOLVED → regressed → evolved)
+### INC-20260716-002 — Model cascade failure cluster (RESOLVED)
+### INC-20260716-005 — IDX EOD processing failures (RESOLVED)
 ### INC-20260716-007 — pr-review-merge-supervisor PR merge blocked (RESOLVED ✅)
-### INC-20260716-006 — oss-builder exec failures (RESOLVED → regressed → INC-20260717-003)
-
----
-
-## TRANSIENT NOISE (1-ERROR JOBS — BELOW THRESHOLD, NOT INCIDENTS)
-
-**5 jobs — gateway restart at ~17:46 WIB** (single event, transient):
-- deployment-supervisor, marketing-supervisor, pr-review-merge-supervisor, code-quality-supervisor, challenge-hunter
-
-**6 jobs — "Agent couldn't generate a response"** (possible correlated with provider instability):
-- Crypto V3 Afternoon Scan, idx-morning-review, idx-duel-evaluate, idx-opening-gap, idx-weekly-position, oss-code-reviewer
-
-**3 jobs — specific errors:**
-- method-daily-record: exec failed (python3 inline script, repo issue)
-- idx-midday-update: exec failed (file listing issue)
-- Call with Janice reminder: no channel configured
-
-All at 1 error — no action taken per false alarm prevention rules.
-
----
-
-## MONITORING
-
-| Job | consecutiveErrors | Threshold for action | Notes |
-|---|---|---|---|
-| openclaw-backup-sync | 5 | ≥5 → ESCALATED | Timeout bump failed. Mixed timeout + gateway restart. ESCALATED. |
-| Crypto V3 Morning Scan | 3 | ≥5 → switch model | Stable, next run tomorrow 06:06. |
+### INC-20260716-006 — oss-builder exec failures (RESOLVED)
 
 ---
 
 ## SYSTEM HEALTH SUMMARY
 
 **Total jobs:** 60
-**Jobs with 0 errors:** 44 (73.3%)
-**Jobs with 1 error:** 14 (23.3%) — transient noise
-**Jobs with ≥2 errors:** 2 (3.3%)
+**Jobs with 0 errors:** 49
+**Jobs with 1 error:** 10
+**Jobs with ≥2 errors:** 1 (Crypto V3 Morning Scan, ce:3)
 
-**Active incidents:** 2 (1 ESCALATED, 1 monitoring)
-**New incidents this cycle:** 0
+**Active incidents:** 6 (0 escalated, 6 monitoring)
+**New this cycle:** 1 (INC-20260719-009 — ZAI provider transient strain)
 **Resolved this cycle:** 0
 
-**Assessment:** No state change since last cycle (18:59 WIB). Both active incidents unchanged — backup-sync next run at 22:22, Crypto V3 next at 06:06. 14 one-error jobs remain transient noise. Fleet stable.
+---
+
+## ⚠️ KEY FINDINGS
+
+1. **ZAI provider billing pressure (NEW):** glm-5.1 returned `429 余额不足或无可用资源包,请充值` (insufficient balance). If the ZAI account is out of credits, this will cascade. Currently only wealth-builder + oss-builder affected, but watch for spread.
+2. **Gateway version mismatch persists:** Running v2026.6.8, config written by v2026.7.1-2. Plugin incompatibilities remain.
+3. **Crypto V3 Morning Scan:** Still ce:3, no new runs until Jul 20.
 
 ---
 
-## ACTIONS TAKEN THIS CYCLE (19:43 WIB)
+## ACTIONS TAKEN THIS CYCLE (09:46 WIB)
 
-1. ✅ Read state file from previous cycle (18:59 WIB)
-2. ✅ Ran STATE-AWARE PROTOCOL pre-flight (5 steps)
-3. ✅ Scanned all 60 cron jobs — 44 healthy, 14 at 1 error (noise), 2 at ≥2 errors
-4. ✅ Confirmed INC-20260718-001 unchanged (5 errors, next run 22:22)
-5. ✅ Confirmed INC-20260718-002 unchanged (3 errors, next run tomorrow 06:06)
-6. ✅ No new incidents — no auto-heal triggered
-7. ✅ Updated state file
+1. ✅ Ran STATE-AWARE PROTOCOL pre-flight (5 steps)
+2. ✅ Scanned all 60 cron jobs
+3. ✅ Analyzed ce≥2: Only Crypto V3 Morning Scan (ce:3) — unchanged
+4. ✅ Analyzed ce==1: 10 jobs — 2 with NEW failures since last cycle
+5. ✅ Identified NEW incident INC-20260719-009: wealth-builder + oss-builder both failed at 09:44 WIB
+6. ✅ Root caused as ZAI provider transient strain (8/10 other jobs succeeded in same window)
+7. ✅ No auto-heal appropriate (ce:1, fallbacks already exhausted, transient)
+8. ✅ "Call with Janice reminder" ce:1 — stale from Jul 5, not actionable
+9. ✅ Updated state file with new incident
 
 ---
 
-## ESCALATION NOTES
+## MONITORING NOTES
 
-### 🔴 openclaw-backup-sync — ESCALATION FOR HUMAN INVESTIGATION
-**Status:** 5 consecutive errors. Auto-heal exhausted.
-**Finding:** Timeout bump to 10800s was applied but ineffective — timeout runs still die at ~7200s (gateway cap suspected). Latest run killed by gateway restart at ~33min.
-**Pattern:**
-- Runs 1-4: timeout at ~7200s despite 10800s config
-- Run 5: killed by gateway restart at ~33min (1976s)
-**Recommended actions (in priority order):**
-1. **Investigate gateway max timeout cap** — check if OpenClaw gateway has a hard 7200s limit
-2. **Implement incremental backups** — full 26G/548K-file backup cannot complete in <2h
-3. **Exclude large directories** — `.git/objects/pack/` likely biggest contributor
-4. **Split into multiple smaller jobs**
-5. **Use rsync with --delete and hardlinks** for efficient incremental sync
+- **INC-20260719-009 (ZAI strain)**: Watch wealth-builder next run (~09:53). If it fails again → ce:2, escalate. The billing error (余额不足) is the red flag.
+- **Crypto V3 Morning Scan**: ce:3, next run Jul 20 06:06 WIB. If it fails → ce:4.
+- **IDX cluster (5 jobs at ce:1)**: Sunday — no IDX runs. Monday Jul 20 is the test.
+- **Edit tool failures (2 jobs)**: Stable at ce:1. No escalation.
+- **code-quality-supervisor**: ce:1, delivery config issue.
