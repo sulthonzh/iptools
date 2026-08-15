@@ -16,3 +16,4 @@ __pycache__/
 coverage.xml
 coverage.html
 coverage.out
+*.tsbuildinfo
