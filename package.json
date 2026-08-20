@@ -1,5 +1,5 @@
 {
-  "name": "@sulthonzh/iptools",
+  "name": "@quadbyte/iptools",
   "version": "1.0.0",
   "description": "Zero-dep IPv4/IPv6 toolkit — parse, validate, CIDR math, subnet division, range operations",
   "main": "index.js",
