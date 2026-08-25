@@ -17,3 +17,15 @@ coverage.xml
 coverage.html
 coverage.out
 *.tsbuildinfo
+
+# OpenClaw workspace leak guards (never commit these)
+SOUL.md
+USER.md
+IDENTITY.md
+SECRETS.md
+TOOLS.md
+memory/
+supervisor/
+pr-supervisor/
+openclaw-workspace-state.json
+*.backup
