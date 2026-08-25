@@ -1,39 +1,39 @@
 # pr-review-merge-supervisor State
 
-Initialized 2026-07-08T18:41:00+00:00
-
 ## Last Run
-- Timestamp: 2026-07-19T09:41:00+07:00
+- Timestamp: 2026-08-25T10:19+07:00 (approx end ~10:35)
 
-## Merged This Cycle
-- sulthonzh/ai-sharia-finance-compliance-indonesia#10 — bcryptjs v3 update, CLEAN, Vercel SUCCESS
-- sulthonzh/ai-sharia-finance-compliance-indonesia#9 — jest v30 update, CLEAN, Vercel SUCCESS
+## Merged This Cycle (6)
+- lucide-react v1.33.0 finishers: rupiahtrack#10, stokku#9 (MERGEABLE/CLEAN, squash)
+- eslint v10.9.1 patches (verified-family, MERGEABLE/CLEAN, squash): ai-compliance-regtech-indonesia#75, ai-powered-telemedicine-indonesia#70, ai-insurance-insurtech-indonesia#23, ai-restaurant-inventory-management-indonesia#22
+- All 6 merge states verified post-merge. 8 consecutive successful runs.
 
-## Reviewed This Cycle
-- sulthonzh/gajiku-ai#1 — Configure Renovate (no CI)
-- sulthonzh/ai-sharia-finance-compliance-indonesia#8 — typescript v7 update, Vercel FAILURE
-- sulthonzh/ai-sharia-finance-compliance-indonesia#6 — eslint v10 update, CLEAN, Vercel SUCCESS (auto-merge disabled)
-- sulthonzh/ai-sharia-finance-compliance-indonesia#5 — lucide-react ^0.577.0 update, CLEAN, Vercel SUCCESS (auto-merge disabled)
+## Infra Notes
+- Foreground exec went to background mid-batch (long-running) but batch COMPLETED — timeout-per-gh-call worked, no hang this time.
+- LESSON: zsh does not word-split vars in for-loops — use `set -- ${=pair}` (cost one call this cycle).
 
-## Conflicts Resolved
-- None
+## Remaining eslint v10.9.1 / v10.9.0 wave (same pattern, next cycle priority 1)
+- ai-aquaculture-fisheries-indonesia#38, ai-sharia-finance-compliance-indonesia#48, ai-real-estate-indonesia#28, ai-real-estate-investment-indonesia#26, ai-email-marketing-indonesia#46, ai-legal-compliance-sharia-consultant#23, ai-consulting-umkm#34, ai-digital-compliance-governance#71, ai-agent-orchestrator#34, dockervis#20, warung-pos#51, csv-quick#20, api-contract-tester#45, avl-tree-x#21, ai-legal-contract-analyzer-smes#46, cloud-cost-shield#31, ai-smart-grid-energy-management-indonesia#32, git-stale#12, ai-sustainable-tourism-platform-indonesia#40, ai-manufacturing-automation-indonesia#19, ai-prompt-validator#37
+- CAREFUL: ai-email-marketing-automation#17 = DIFFERENT repo, known DO NOT MERGE (Vercel deploy fails)
 
-## Pending
-- 100+ open PRs remaining
-- Multiple CLEAN PRs blocked by branch policy restrictions (auto-merge disabled, no admin privileges)
-- Several UNSTABLE PRs (Vercel infrastructure failures)
+## Other safe-batch candidates (next cycles)
+- typescript-eslint v8.68.0 / monorepo: ai-sharia-finance-compliance-indonesia#49, ai-agent-orchestrator#35, npm-outdated-check#63, ai-technical-debt-cli#23, dockervis#21
+- @types/node v26.3.0: iptools#13, ai-technical-debt-cli#24
+- @testing-library/user-event v14.6.6: wealth-builder#82, ai-fish-disease-detection-indonesia#18, simple-wealth-tracker#27
 
-## Known Issues
-- BLOCKED PRs: Branch policy prohibits auto-merge despite all CI passing (requires enablePullRequestAutoMerge or admin merge)
-- UNSTABLE PRs: Vercel infrastructure failures (external dependency)
-- No CI: gajiku-ai#1 has no CI checks configured
+## Investigated (standing — DO NOT MERGE)
+- ai-email-marketing-automation#17 — Vercel deploy FAILS
+- TS7 GENUINE BREAKERS: islamic-finance-dashboard#28 + siblings — needs Next.js ≥16.2.11 first
+- dbmigrate#32 (changesets v2.1.1) — branch protection
 
-## Analysis This Cycle
-- Successfully merged 2 CLEAN Renovate dependency PRs (bcryptjs, jest)
-- Auto-merge is disabled in ai-sharia-finance-compliance-indonesia, blocking additional CLEAN PRs
-- Pattern: All CI passing but auto-merge disabled across repos
+## Blocked
+- ~45 changesets PRs BLOCKED by branch policy — **7-day mark 08-27: re-flag in decisions log NEXT cycle (08-26/08-27 run)**
 
-## Resolution
-- Merged 2 CLEAN dependency PRs
-- BLOCKED pattern documented: auto-merge disabled despite all CI passing
-- Will continue processing CLEAN mergeable PRs where auto-merge is enabled
+## Pending — Next Cycle Priority
+1. eslint v10.9.x wave (~21 PRs listed above; cap 6/cycle)
+2. typescript-eslint v8.68.0 batch (5)
+3. **08-27 ESCALATION: re-flag ~45 changesets BLOCKED + dbmigrate#32**
+4. @types/node v26 + user-event batches
+5. react monorepo v19 wave (~6) — real review, NOT auto-merge
+6. stokku#14 + kalkulatorpph21#11 (eslint v10 MAJOR) — careful review
+7. Backlog: tokowrite (9), stokku, voice-ai-service, warung-pos

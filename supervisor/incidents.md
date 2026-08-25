@@ -1,134 +1,85 @@
 # Supervisor Incident Scanner State
 
-Last updated: 2026-07-19 09:46 WIB
+Last updated: 2026-08-25 10:47 WIB
 
 ## ACTIVE INCIDENTS
 
-### INC-20260719-009 — ZAI provider transient capacity strain (ACTIVE 🟡 — MONITORING)
-- **Affected jobs:** wealth-builder (fd2ea97b ce:1), oss-builder (372e2507 ce:1)
-- **Root cause:** ZAI provider capacity strain — glm-5.1 hit billing limit (429 余额不足), glm-4.5-air and glm-4.7-flash both timed out (60s idle timeout)
-- **Error (wealth-builder):** `All models failed (3): zai/glm-5.1: 429 余额不足或无可用资源包,请充值 (billing) | glm-4.5-air: LLM idle timeout (60s) | glm-4.7-flash: 429 Rate limit reached`
-- **Error (oss-builder):** `All models failed (3): glm-5.2: LLM idle timeout (60s) | glm-4.5-air: LLM idle timeout (60s) | glm-4.7-flash: LLM idle timeout (60s)`
-- **First seen:** 2026-07-19 09:44 WIB (both jobs failed within seconds of each other)
-- **Status:** MONITORING — ce:1 on both. 8/10 other jobs in the same window succeeded. This session itself runs on glm-5.2 without issues. Likely transient capacity/rate limit strain on ZAI provider, NOT a full outage.
-- **Actions taken:** None. Model swap won't help (fallbacks already exhausted). ce < 2, no auto-heal threshold met.
-- **Next runs:** wealth-builder ~09:53 WIB, oss-builder scheduled but less frequent.
-- **Note:** The glm-5.1 billing error (余额不足) is concerning — if ZAI account balance is depleted, this will cascade to all glm-5.1 jobs. Watch for ce escalation on next runs.
+**INC-20260824-003 — business-validator tool-class failure — OPEN 🟡**
+- Job: business-validator (27a3ce93-a246-47ce-b835-5564ee98e068), ce=6
+- 16:00 WIB verification run FAILED, but **new error class**: `⚠️ 🧰 Process: 'calm-trail' failed` (source=tool, 60s duration, glm-5.2 responded). NOT timeout (prior AbortError was 56.6-min; this died in 60s), NOT model.
+- Per Step 5: tool failures → NO auto-fix. ce≥5 fixes only apply to timeout/model root cause — neither applies.
+- Root cause: job's own tool/process dependency (`calm-trail` named process) failing. Not scanner-fixable; job logic or workspace issue.
+- History: 08-22 14:00 FallbackSummaryError → 08-23 13:11 AbortError → 08-23 19:14 AbortError (56.6min) → 08-24 16:00 Process failure.
+- Next run 08-25 16:00 WIB. If tool-class repeats → escalate pattern to decisions (2 consecutive tool failures = job-logic bug, needs human/job-owner).
+- First seen (this class): 08-24 16:00 | Last seen: 08-24 16:00 WIB
 
-### INC-20260719-002 — Crypto V3 Morning Scan agent generation failure (ACTIVE 🟡 — MONITORING)
-- **Affected jobs:** Crypto V3 Morning Scan (79e66b9f)
-- **Root cause:** Agent can't generate response — NOT model-specific (fails on both glm-5.1 AND glm-4.5-air fallback)
-- **Error:** `Agent couldn't generate a response. Note: some tool actions may have already been executed`
-- **consecutiveErrors:** 3 (unchanged — no new run since Jul 18)
-- **First seen:** 2026-07-16
-- **Last seen:** 2026-07-18 06:12 WIB
-- **Next run:** 2026-07-20 06:06 WIB
-- **Status:** MONITORING — ce < 5, model swap won't help since already failing on fallback model. Runs once/day so ce grows slowly.
-- **Actions taken:** None. Root cause appears to be prompt complexity/tool interaction, not model capability.
-- **Note:** If ce hits 5, no effective auto-heal available.
+## WATCHLIST
 
-### INC-20260719-004 — "Agent couldn't generate response" cluster (ACTIVE 🟡 — STABLE at ce:1)
-- **Affected jobs (5):** idx-morning-review (ce:1), idx-duel-evaluate (ce:1), idx-opening-gap (ce:1), idx-weekly-position (ce:1), Crypto V3 Afternoon Scan (ce:1)
-- **Root cause:** Same error pattern as INC-20260719-002 — agent fails to generate response. Likely systemic gateway v2026.6.8 incompatibility.
-- **consecutiveErrors:** All at 1
-- **First seen:** 2026-07-18
-- **Status:** STABLE — Sunday, IDX jobs won't run (market closed). Monday will be the real test.
-- **Note:** These 5 IDX jobs last ran Jul 17-18 (Fri/Sat). Monday Jul 20 runs will show if this self-resolves.
+- **business-validator (INC-003)**: next 16:00 WIB run 08-25. Tool-class repeat → escalate.
+- **halal-wealth-research-supervisor — RECOVERED 08-25 07:43 WIB.** ce=1→0, 07:37 run clean. 2nd blip self-recovered again → intermittent tool blip, no pattern escalation warranted.
+- **idx-daily-swing ce=1** (08-24 16:18: `Exec failed`) — tool-class, below threshold. No new runs since 08-24.
+- **idx-weekly-calibration ce=2** — next run 08-28 16:30 WIB, verify then.
+- **idx-predict-premarket ce=1** (08-25 08:00 WIB, "Agent couldn't generate a response", generic class, single occurrence). Below threshold, expect self-recovery.
+- **oss-idea-researcher — RECOVERED 08-25 ≤10:18 WIB.** ce=1→0, self-recovered as expected.
+- ce=1 stale noise (idx-weekly-position 08-21, method-weekly-calibrate 08-22, Janice reminder permanent): known, ignore.
 
-### INC-20260719-006 — Edit tool failures (ACTIVE 🟡 — STABLE)
-- **Affected jobs (2):** oss-code-reviewer (ce:1), deployment-supervisor (ce:1)
-- **Root cause:** Edit tool failing — `⚠️ 📝 Edit: ... failed`
-- **consecutiveErrors:** Both at 1 (unchanged)
-- **First seen:** 2026-07-19 ~02:00-02:20 WIB
-- **Status:** STABLE — no new Edit tool failures, no escalation.
-- **Actions taken:** None. Both ce:1, likely transient.
+## CLEARED TODAY
 
-### INC-20260719-007 — Exec pipeline failures (ACTIVE 🟡 — STABLE)
-- **Affected jobs:** method-daily-record (ce:1), idx-midday-update (ce:1)
-- **Root cause:** Various exec failures (different root causes)
-- **consecutiveErrors:** Both at 1 (unchanged)
-- **Status:** STABLE — transient exec failures at ce:1.
+- **challenge-hunter — CLEARED 08-25 00:43 WIB.** ce=1→0, self-recovered from GatewayDrainingError (infra-class, self-recovers as predicted).
+- **halal-wealth-research-supervisor — CLEARED 08-25 02:43 WIB.** ce=1→0, 02:37 run clean. Self-recovered from Edit tool blip as predicted.
 
-### INC-20260719-008 — code-quality-supervisor Message failure (ACTIVE 🟡 — STABLE)
-- **Affected jobs:** code-quality-supervisor (19429af5)
-- **Root cause:** Delivery/messaging failure — `⚠️ ✉️ Message failed`
-- **consecutiveErrors:** 1 (unchanged)
-- **First seen:** 2026-07-19 ~04:46 WIB
-- **Status:** STABLE — delivery config issue, not actionable by incident scanner.
+## RESOLVED TODAY
 
----
+- **Crypto V3 Afternoon tail — RESOLVED ✅ 17:31 WIB scan.** 16:11 WIB run clean, ce=0. Self-reset confirmed (was model-class tail from 08-23 16:08). No action needed.
 
-## RECENTLY RESOLVED
+## RESOLVED INCIDENTS (HISTORY — condensed)
 
-### INC-20260719-001 — openclaw-backup-sync timeout (RESOLVED ✅ — 2026-07-19 09:35)
-- **Resolution:** Timeout bump to 14400s (4h) worked. Job ran successfully at 06:02 WIB Jul 19, completed in 199 minutes (3h19m).
-- **CE trajectory:** 6→0
+- **INC-20260824-002 (zai post-recovery flapping) — CLOSED 2026-08-24 14:44 WIB.** oss 14:23 + code-quality 14:00 both clean.
+- **INC-20260824-001 (zai-coding-plan provider outage, 17 jobs, ~34h) — CLOSED 2026-08-24 11:11 WIB.**
+- **pr-review-merge-supervisor — CLEARED 2026-08-24 12:50 WIB** (26/26 merged).
+- INC-20260821-001 (idx-weekly-calibration) — merged into INC-001; tail resolves 08-28.
+- daily-report-6am — RECOVERED 08-22. | INC-20260821-002 — RESOLVED 08-21. | INC-20260820-002 — RESOLVED 08-21 (auto-fix glm-5.2).
+- Earlier — see git history of this file.
 
-### INC-20260719-005 — marketing-supervisor exec failure (RESOLVED ✅)
-### INC-20260719-003 — wealth-builder exec failure (RESOLVED ✅)
-### INC-20260718-004 — marketing-supervisor exec failure (RESOLVED ✅)
-### INC-20260718-003 — wealth-builder exec + billing failures (RESOLVED ✅)
-### INC-20260718-001 — openclaw-backup-sync timeout (RESOLVED → REGRESSED → FINALLY RESOLVED as INC-20260719-001)
-### INC-20260718-002 — Crypto V3 Morning Scan agent failure (RESOLVED → REGRESSED to INC-20260719-002)
+## SYSTEM HEALTH SUMMARY (2026-08-24 22:43 WIB)
 
----
-
-## RESOLVED INCIDENTS (HISTORY)
-
-### INC-20260717-007 — Crypto V3 Morning Scan (RESOLVED → REGRESSED)
-### INC-20260717-006 — openclaw-backup-sync timeout (RESOLVED → REGRESSED → FINALLY RESOLVED)
-### INC-20260717-003 — ZAI provider rate limit cluster (RESOLVED ✅)
-### INC-20260717-004 — IDX daily-rankings process kill failure (RESOLVED ✅)
-### INC-20260717-005 — Crypto V3 Morning Scan (MERGED)
-### INC-20260717-001 — ZAI provider instability cluster (RESOLVED)
-### INC-20260717-002 — Supervisor toolchain failures (RESOLVED)
-### INC-20260716-004 — wealth-product-owner persistent failures (RESOLVED ✅)
-### INC-20260716-002 — Model cascade failure cluster (RESOLVED)
-### INC-20260716-005 — IDX EOD processing failures (RESOLVED)
-### INC-20260716-007 — pr-review-merge-supervisor PR merge blocked (RESOLVED ✅)
-### INC-20260716-006 — oss-builder exec failures (RESOLVED)
-
----
-
-## SYSTEM HEALTH SUMMARY
-
-**Total jobs:** 60
-**Jobs with 0 errors:** 49
-**Jobs with 1 error:** 10
-**Jobs with ≥2 errors:** 1 (Crypto V3 Morning Scan, ce:3)
-
-**Active incidents:** 6 (0 escalated, 6 monitoring)
-**New this cycle:** 1 (INC-20260719-009 — ZAI provider transient strain)
-**Resolved this cycle:** 0
-
----
-
-## ⚠️ KEY FINDINGS
-
-1. **ZAI provider billing pressure (NEW):** glm-5.1 returned `429 余额不足或无可用资源包,请充值` (insufficient balance). If the ZAI account is out of credits, this will cascade. Currently only wealth-builder + oss-builder affected, but watch for spread.
-2. **Gateway version mismatch persists:** Running v2026.6.8, config written by v2026.7.1-2. Plugin incompatibilities remain.
-3. **Crypto V3 Morning Scan:** Still ce:3, no new runs until Jul 20.
-
----
-
-## ACTIONS TAKEN THIS CYCLE (09:46 WIB)
-
-1. ✅ Ran STATE-AWARE PROTOCOL pre-flight (5 steps)
-2. ✅ Scanned all 60 cron jobs
-3. ✅ Analyzed ce≥2: Only Crypto V3 Morning Scan (ce:3) — unchanged
-4. ✅ Analyzed ce==1: 10 jobs — 2 with NEW failures since last cycle
-5. ✅ Identified NEW incident INC-20260719-009: wealth-builder + oss-builder both failed at 09:44 WIB
-6. ✅ Root caused as ZAI provider transient strain (8/10 other jobs succeeded in same window)
-7. ✅ No auto-heal appropriate (ce:1, fallbacks already exhausted, transient)
-8. ✅ "Call with Janice reminder" ce:1 — stale from Jul 5, not actionable
-9. ✅ Updated state file with new incident
-
----
+**Total jobs:** 60 | **ce≥2:** 2 (both known, unchanged) | **ce≥5:** 1 (business-validator) | Runs since 21:48: 10, errors 0 (incl. Crypto V3 Night, code-quality, pr-review, deployment — all clean). Provider zai-coding-plan stable — no new model-class errors post-recovery.
 
 ## MONITORING NOTES
 
-- **INC-20260719-009 (ZAI strain)**: Watch wealth-builder next run (~09:53). If it fails again → ce:2, escalate. The billing error (余额不足) is the red flag.
-- **Crypto V3 Morning Scan**: ce:3, next run Jul 20 06:06 WIB. If it fails → ce:4.
-- **IDX cluster (5 jobs at ce:1)**: Sunday — no IDX runs. Monday Jul 20 is the test.
-- **Edit tool failures (2 jobs)**: Stable at ce:1. No escalation.
-- **code-quality-supervisor**: ce:1, delivery config issue.
+- Scanner self-note: own run OK streak continues.
+- **⚠️ SCANNER GOTCHA (permanent):** NEVER trust `/tmp/cron-health.json` — mole writes stale counters mid-run. Own the scan output (/tmp/incident-scan.json).
+- **⚠️ FORMAT NOTES:** `cron list --json --all` → object `{jobs:[...]}`; ce in `.state.consecutiveErrors`; real timestamps in `.state.lastRunAtMs` (NOT lastRunAt — epoch 0); `cron runs` REQUIRES `--id` flag; strip "Config warnings" preamble with `sed -n '/^{/,$p'`; `cron runs` takes 60–150s — run to FILE. Run-history files under cron/runs are `*.jsonl.migrated` and STALE — only CLI gives current truth. macOS `date -r` on ms-epochs → truncate to seconds first. jq quoting: avoid escaped double-quotes inside `\( )` interpolation in zsh single-quoted programs.
+- **⚠️ ENVIRONMENT NOTES (not incidents, persisting):**
+  1. Gateway/CLI version mismatch (>1 month) — plugins skipped at discovery. Needs human.
+  2. zai bare-provider OUT OF BALANCE (`429 余额不足`) — leaking into fallback chains. Human recharge decision.
+  3. zai-coding-plan recurrence watch CLOSED 08-24 14:44 (INC-002). Provider stable since 11:11 recovery.
+  4. glm-4.5-air quality quirk: occasionally emits malformed tool calls. Note-only.
+
+## CYCLE LOG
+
+- 2026-08-25 10:47 WIB: Quiet scan. 60 jobs, ce≥2: 2 — both known, unchanged (INC-003 business-validator ce=6, lastRun still 08-24 16:00, verification run 16:00 WIB today; idx-weekly-calibration ce=2, next 08-28 16:30). ce=1 set identical to 10:18 scan (idx-daily-swing, idx-predict-premarket 08:00 WIB, idx-weekly-position, method-weekly-calibrate, Janice) — all watchlisted, no new errors. NO_ACTION.
+- 2026-08-25 10:18 WIB: Quiet scan. 60 jobs, ce≥2: 2 — both known, unchanged (INC-003 business-validator ce=6, lastRun still 08-24 16:00, verification run 16:00 WIB today; idx-weekly-calibration ce=2, next 08-28 16:30). oss-idea-researcher self-recovered ce=1→0 as predicted. idx-predict-premarket still ce=1 (08:00 run, no new run since). Other ce=1 unchanged. NO_ACTION.
+
+- 2026-08-25 08:43 WIB: Scan. 60 jobs, ce≥2: 2 — both known, unchanged (INC-003 business-validator ce=6, lastRun 08-24 16:00, verification run 16:00 WIB today; idx-weekly-calibration ce=2, next 08-28 16:30). NEW ce=1 × 2: oss-idea-researcher (08:23 WIB) + idx-predict-premarket (08:00 WIB), both generic "Agent couldn't generate a response" — below threshold, watchlisted. halal-wealth-research-supervisor clean since 07:37. Other ce=1 unchanged. NO_ACTION.
+
+- 2026-08-25 07:43 WIB: Quiet scan. 60 jobs, ce≥2: 2 — both known, unchanged (INC-003 business-validator ce=6, verification run due 08-25 16:00; idx-weekly-calibration ce=2, next 08-28 16:30). halal-wealth-research-supervisor RECOVERED ce=1→0 (07:37 run clean, 2nd self-recovery — blip class, not a pattern). Other ce=1 items unchanged. 4 runs since 06:43, 0 errors. NO_ACTION.
+- 2026-08-25 06:43 WIB: Quiet scan. 60 jobs, ce≥2: 2 — both known, unchanged (INC-003 business-validator ce=6, verify 08-25 16:00; idx-weekly-calibration ce=2, next 08-28 16:30). 14 runs last hour, 1 below-threshold error: halal-wealth-research-supervisor REGRESSED to ce=1 (06:37 run, 2nd intermittent blip post-recovery) → watchlist. Other ce=1 unchanged. NO_ACTION.
+- 2026-08-25 05:43 WIB: Quiet scan. 60 jobs, ce≥2: 2 — both known, unchanged (INC-003 business-validator ce=6, lastRun still 08-24 16:00, verification 08-25 16:00; idx-weekly-calibration ce=2, next 08-28 16:30). ce=1 set identical to 04:43 scan (idx-daily-swing, idx-weekly-position, method-weekly-calibrate, Janice) — all watchlisted, no new errors. NO_ACTION.
+- 2026-08-25 04:43 WIB: Quiet scan. 60 jobs, ce≥2: 2 — both known, unchanged (INC-003 business-validator ce=6, lastRun still 08-24 16:00, verification 08-25 16:00; idx-weekly-calibration ce=2, next 08-28 16:30). ~14 runs since 21:48, 0 errors. All ce=1 items identical to 03:43 scan (idx-daily-swing 08-24 16:18 last, no runs since; idx-weekly-position, method-weekly-calibrate, Janice) — watchlisted. NO_ACTION.
+- 2026-08-25 03:43 WIB: Quiet scan. 60 jobs, ce≥2: 2 — both known, unchanged (INC-003 business-validator ce=6, lastRun still 08-24 16:00, verification 08-25 16:00; idx-weekly-calibration ce=2, next 08-28 16:30). 15 runs since 02:43, 0 errors (incl. code-quality, oss-idea-researcher, opencode-session, halal-wealth — all clean). ce=1 items identical to prior scan, all watchlisted. NO_ACTION.
+- 2026-08-25 02:43 WIB: Quiet scan. 60 jobs, ce≥2: 2 — both known, unchanged (INC-003 business-validator ce=6, lastRun still 08-24 16:00, verification 08-25 16:00; idx-weekly-calibration ce=2, next 08-28 16:30). halal-wealth-research-supervisor self-recovered ce=1→0 (02:37 run clean, as predicted) — cleared from watchlist. Other ce=1 items unchanged. NO_ACTION.
+- 2026-08-25 01:43 WIB: Quiet scan. 60 jobs, ce≥2: 2 — both known, unchanged (INC-003 business-validator ce=6, lastRun still 08-24 16:00, verification 08-25 16:00; idx-weekly-calibration ce=2, next 08-28 16:30). NEW ce=1: halal-wealth-research-supervisor (Edit-on-state-file tool blip; file healthy, content written 01:37; next 02:37, expect self-recover) → watchlist. Other ce=1 items unchanged. NO_ACTION.
+- 2026-08-25 00:43 WIB: Quiet scan. challenge-hunter self-recovered ce=1→0 — cleared. NO_ACTION.
+- 2026-08-24 23:43 WIB: Quiet scan. 60 jobs, ce≥2: 2 — both known and unchanged (INC-003 business-validator ce=6, lastRun still 08-24 16:00, verify 08-25 16:00; idx-weekly-calibration ce=2, next 08-28 16:30). All 5 ce=1 items identical to 22:43 scan (challenge-hunter, idx-daily-swing, idx-weekly-position, method-weekly-calibrate, Janice) — no new errors. NO_ACTION.
+- 2026-08-24 20:43–22:43 WIB: Quiet scans. Both known incidents unchanged; 0 new errors. NO_ACTION.
+- 2026-08-24 19:43 WIB: Quiet scan. 60 jobs, ce≥2: 2 — both known and unchanged (INC-003 business-validator ce=6, no new runs since 16:00; idx-weekly-calibration ce=2, next 08-28). New below-threshold: challenge-hunter ce=1 GatewayDrainingError (infra, self-recovers) → watchlist. ~11 runs since last scan, 0 errors. NO_ACTION.
+- 2026-08-24 18:43 WIB: Quiet scan (post-recovery). 60 jobs, ce≥2: 2 — both known (INC-003 business-validator ce=6, lastRun still 08-24 16:00, no new runs; idx-weekly-calibration ce=2, unchanged, next 08-28). No new errors since 17:47 scan. NO_ACTION.
+- 2026-08-24 17:47 WIB: Quiet scan. 5 runs since 17:35, 0 errors. idx-daily-rankings self-recovered (17:36 run clean, ce→0) — removed from watchlist. INC-003 unchanged, verification run 08-25 16:00. idx-daily-swing still ce=1 (below threshold). NO_ACTION.
+- 2026-08-24 17:35 WIB: Pre-registered verification executed. business-validator 16:00 FAILED — new tool-class error (`calm-trail` process, 60s) → opened INC-20260824-003, NO auto-fix (tool failures excluded by rule). Crypto V3 Afternoon 16:11 clean → tail RESOLVED. New ce=1 below-threshold: idx-daily-rankings (timeout-class), idx-daily-swing (Exec failed) — watchlisted. idx-weekly-calibration unchanged (08-28).
+- 2026-08-24 15:43 WIB: Interim scan. 9 runs since 14:44 — 0 errors. NO_ACTION: verification runs not yet due.
+- 2026-08-24 14:44 WIB: CLOSED INC-20260824-002 — both close conditions verified.
+- 2026-08-24 13:50 WIB: oss 13:26 canary clean but tripwire touched once → INC-002 held open.
+- 2026-08-24 12:50 WIB: INC-002 recovering; pr-review-merge CLEARED.
+- 2026-08-24 11:15/11:52 WIB: closed INC-001, opened INC-002 (flapping), extended once.
+- Earlier cycles — see git history.

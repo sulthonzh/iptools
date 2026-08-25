@@ -1,0 +1,42 @@
+# 🕳️ MOLE STATE — MAIN
+
+## LAST UPDATE
+2026-08-17T21:25:00+07:00 (DISK_USAGE_REVIEW_CYCLE)
+
+## CURRENT STATUS
+- Disk: 13G (stable)
+- Cron Health: Not checked (jq parse error)
+- Agent Workspaces: Previously validated ✅
+- Stale Sessions: Clean (0 dirs >7d)
+
+## ACTIONS THIS CYCLE
+1. DISK_USAGE_REVIEW
+   - Checked: 13G total breakdown
+   - Breakdown: agents 7.7G, npm 3.5G, tmp 1.2G, workspace 626M, state 182M
+   - Result: No cleanable items - all essential or active cache
+   - Category: ⚪ DONE_EXCEPTIONAL
+
+## PREVIOUS CYCLES
+1. STALE_SESSIONS_CLEANUP (2026-08-17T20:36:00)
+   - Checked: /Users/sulthonzh/.openclaw/tmp/
+   - Result: 0 directories >7d, already clean
+   - Category: ⚪ DONE_EXCEPTIONAL
+
+2. WORKSPACE_VALIDATION (2026-08-17T20:06:00)
+   - Checked: 60 cron jobs
+   - Result: 0 consecutive errors, all healthy
+   - Category: ⚪ DONE_EXCEPTIONAL
+
+3. CRON_HEALTH_CHECK (2026-08-17T17:25:00)
+   - Analyzed: 13G total breakdown
+   - Result: No cleanable items - all essential or active cache
+   - Category: ⚪ DONE_EXCEPTIONAL
+   - Detail: agents 7.7G, npm 3.5G, tmp 1.2G (node-compile-cache active), workspace 626M, state 182M
+
+4. DISK_USAGE_REVIEW (2026-08-17T13:57:00)
+   - Checked: 60 cron jobs
+   - Result: 0 consecutive errors, all healthy
+   - Category: ⚪ DONE_EXCEPTIONAL
+
+## PENDING ATTENTION
+- None

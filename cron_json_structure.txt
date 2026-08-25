@@ -1,0 +1,63 @@
+Structure of `openclaw cron list --json --all` output:
+
+1.  **Top-Level Structure**:
+    -   **Array**: The output is a JSON array of objects. Each object represents a single cron job.
+    -   **Example**: `[{ "id": "...", ... }, { "id": "...", ... }]`
+
+2.  **Job Object (Per Cron Job)**:
+    -   `id` (string): A unique identifier for the cron job (UUID format).
+    -   `name` (string): A human-readable name for the job (e.g., "idx-afternoon-momentum", "oss-idea-researcher").
+    -   `description` (string): A brief description of the job's purpose.
+    -   `enabled` (boolean): Whether the job is active.
+    -   `createdAtMs` (number): Unix timestamp in milliseconds of when the job was created.
+    -   `updatedAtMs` (number): Unix timestamp in milliseconds of when the job was last updated.
+    -   `agentId` (string): The ID of the agent responsible for running this job (e.g., "main", "oss-lab").
+    -   `sessionKey` (string): The session key for the cron job, often starting with `cron:`.
+
+3.  **Schedule Object (`schedule`)**:
+    -   `kind` (string): The type of schedule, always "cron" in the example.
+    -   `expr` (string): The cron expression defining when the job runs (e.g., "23 * * * *").
+    -   `tz` (string): The time zone for the schedule (e.g., "Asia/Jakarta").
+    -   `staggerMs` (number): A delay in milliseconds to stagger the start of the job.
+
+4.  **Session Configuration**:
+    -   `sessionTarget` (string): The target type for the session, e.g., "isolated".
+    -   `wakeMode` (string): How the job is woken, e.g., "now".
+
+5.  **Payload Object (`payload`)**:
+    -   `kind` (string): The kind of payload, e.g., "agentTurn".
+    -   `message` (string): A long string containing the full instructions or script for the job.
+    -   `model` (string): The AI model used for the job (e.g., "zai-coding-plan/glm-5.2").
+    -   `fallbacks` (array of strings): A list of alternative models to use if the primary fails.
+    -   `timeoutSeconds` (number): The maximum runtime for the job in seconds.
+    -   `toolsAllow` (array of strings): A list of tool names that the job is allowed to use.
+
+6.  **Delivery Object (`delivery`)**:
+    -   `mode` (string): The delivery mode for the job's output, e.g., "none".
+    -   `channel` (string): The channel for delivery, e.g., "last".
+
+7.  **State Object (`state`)**:
+    -   `nextRunAtMs` (number): Unix timestamp in milliseconds for the next scheduled run.
+    -   `lastRunAtMs` (number): Unix timestamp in milliseconds for the last run.
+    -   `lastRunStatus` (string): Status of the last run, e.g., "ok", "error".
+    -   `lastStatus` (string): The last recorded status (duplicate of `lastRunStatus` in example).
+    -   `lastDurationMs` (number): Duration of the last run in milliseconds.
+    -   `lastDeliveryStatus` (string): The delivery status for the last run, e.g., "not-requested".
+    -   `lastFailureNotificationDeliveryStatus` (string): The delivery status of the last failure notification, e.g., "not-requested".
+    -   `consecutiveErrors` (number): Count of consecutive errors.
+    -   `consecutiveSkipped` (number): Count of consecutive skips.
+
+8.  **Diagnostics** (Optional):
+    -   `lastDiagnostics` (object): Contains diagnostic information for the last run.
+        -   `summary` (string): A brief summary of diagnostics.
+        -   `entries` (array of objects): A list of diagnostic log entries.
+            -   `ts` (number): Timestamp of the entry.
+            -   `source` (string): Source of the entry (e.g., "tool").
+            -   `severity` (string): Severity level (e.g., "warn").
+            -   `message` (string): The diagnostic message.
+    -   `lastDiagnosticSummary` (string): A copy of the summary string.
+
+9.  **Top-Level Duplicates (for convenience)**:
+    -   The `state` object's fields are also duplicated at the top level of the job object for quick access.
+    -   Examples: `nextRunAtMs`, `lastRunAtMs`, `lastRunStatus`, `lastDeliveryStatus`, `status`.
+    -   Note: `status` is not present in the `state` object but appears at the top level.
